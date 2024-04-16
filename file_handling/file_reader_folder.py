@@ -1,4 +1,7 @@
 import os
+from docx import Document
+import base64
+from io import BytesIO
 
 def extract_text_from_file(file_path):
     # This is a simplified placeholder. You'll need to adjust this to handle different file types.
@@ -25,3 +28,18 @@ def extract_texts_from_folder(directory):
                     texts.append(file_text)
                     file_names.append(file)  # Add the file name to the list
     return texts, file_names
+
+def save_test_plan(full_test_plan):
+    doc = Document()
+    for section, content in full_test_plan.items():
+        doc.add_heading(section, level=1)
+        doc.add_paragraph(content)
+    return doc
+
+def download_link(doc, filename, text):
+    # Generate download link for the document
+    buffer = BytesIO()
+    doc.save(buffer)
+    b64 = base64.b64encode(buffer.getvalue()).decode()
+    href = f'<a href="data:application/octet-stream;base64,{b64}" download="{filename}">{text}</a>'
+    return href

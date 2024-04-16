@@ -1,5 +1,6 @@
 import streamlit as st
-from file_handling.file_reader_folder import extract_texts_from_folder
+import time
+from file_handling.file_reader_folder import extract_texts_from_folder,save_test_plan,download_link
 from pre_processing.keyword_extraction import extract_keywords
 from open_ai.openai_integration_updated import generate_section, list_engines, generate_test_plan_identifier, extract_main_features_and_criticality,ai_based_testing_estimation,generate_excluded_features_section
 from pre_processing.sentiment_analysis import assess_sentiment
@@ -30,6 +31,13 @@ domains = [
     "Ecology and Environmental Protection", "Project Management Industry", "Logistics",
     "Procurement Management Solution", "Digital Agriculture"
 ]
+sections = [
+    "Test Plan Identifier", "References", "Approvals", "Introduction", "Test Items", "Software Risk Issues",
+    "Features to be Tested", "Features not to be Tested", "Approach", "Item Pass/Fail Criteria",
+    "Suspension Criteria and Resumption Requirements", "Test Deliverables", "Remaining Test Tasks", "Test Data Needs",
+    "Environmental Needs", "Staffing and Training Needs", "Responsibilities", "Schedule",
+    "Planning Risks and Contingencies", "Test Estimation", "Glossary"
+]
 selected_domain = st.selectbox("Select the application domain:", domains)
 reference_urls = st.text_area("Enter reference URLs (comma-separated if multiple):")
 tech_stack = {
@@ -58,7 +66,47 @@ num_security_testers = st.number_input("Number of Security Testers", min_value=0
 # Directory path input for documents
 document_directory = st.text_input("Enter the directory path to scan for documents:")
 
+section_status_placeholder = st.empty()
+local_progress_placeholder = st.empty()
+overall_status_placeholder = st.empty()
+overall_progress_placeholder = st.empty()
+
+def display_all_sections_complete():
+    st.markdown(
+        "<div style='background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px;'>"
+        "All sections generated successfully! ✔️</div>",
+        unsafe_allow_html=True
+    )
+
+
+def generate_section_prog(section_name, index, total_sections):
+    # Custom style for the section generation message
+    section_status_placeholder.markdown(
+        f"<div style='background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px;'>"
+        f"Generating: **{section_name}**...</div>",
+        unsafe_allow_html=True
+    )
+    local_progress = local_progress_placeholder.progress(0)
+    steps = 10  # Simulate steps within each section generation
+
+    for step in range(steps):
+        time.sleep(0.1)  # Simulate processing
+        local_progress.progress((step + 1) / steps)
+
+    overall_progress_placeholder.progress((index + 1) / total_sections)
+    section_status_placeholder.markdown(
+        f"<div style='background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px;'>"
+        f"Completed: **{section_name}** ✔️</div>",
+        unsafe_allow_html=True
+    )
+total_sections = len(sections)
+
 if st.button("Extract Text and Generate Test Plan"):
+    overall_status_placeholder.markdown(
+        "<div style='background-color: #2196F3; color: white; padding: 10px; border-radius: 5px;'>"
+        "Preparing the Test Plan...</div>",
+        unsafe_allow_html=True
+    )
     if document_directory:
         extracted_texts, file_names = extract_texts_from_folder(document_directory)
         user_stories_text = "\n\n".join(extracted_texts)
@@ -67,13 +115,7 @@ if st.button("Extract Text and Generate Test Plan"):
         keywords = extract_keywords(user_stories_text)
         features, criticalities = extract_main_features_and_criticality(selected_engine, user_stories_text, api_key)
         urls_list = reference_urls.split(',') if reference_urls else []
-        sections = [
-            "Test Plan Identifier", "References","Approvals", "Introduction", "Test Items", "Software Risk Issues",
-            "Features to be Tested", "Features not to be Tested", "Approach", "Item Pass/Fail Criteria",
-            "Suspension Criteria and Resumption Requirements", "Test Deliverables", "Remaining Test Tasks", "Test Data Needs",
-            "Environmental Needs", "Staffing and Training Needs", "Responsibilities", "Schedule",
-            "Planning Risks and Contingencies", "Test Estimation","Glossary"
-        ]
+
 
         options = {
             'application_name': application_name,
@@ -94,7 +136,7 @@ if st.button("Extract Text and Generate Test Plan"):
 
 
         full_test_plan = {}
-        for section in sections:
+        for index, section in enumerate(sections):
             st.subheader(section)
             if section == "Test Plan Identifier":
                 references_text = "Documents:\n" + "\n".join(options['file_names'])
@@ -155,6 +197,18 @@ if st.button("Extract Text and Generate Test Plan"):
                 full_test_plan[section] = remaing_section
             else:
                 full_test_plan[section] = generate_section(selected_engine, section, user_stories_text, api_key, options)
+            generate_section_prog(section, index, total_sections)
             st.write(full_test_plan[section])
+        display_all_sections_complete()
+        overall_status_placeholder.markdown(
+            "<div style='background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px;'>"
+            "Test Plan generation complete! ✔️</div>",
+            unsafe_allow_html=True
+        )
+        doc = save_test_plan(full_test_plan)
+        link = download_link(doc, "Test_Plan.docx", "Download as Word Document")
+        st.markdown(link, unsafe_allow_html=True)
+    if st.button('Reset'):
+        st.experimental_rerun()
     else:
         st.error("Please enter a valid directory path.")
