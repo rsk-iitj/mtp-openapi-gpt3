@@ -3,21 +3,25 @@ import base64
 from docx import Document
 import re
 from io import BytesIO
+import textract
 
 def extract_text_from_file(file_path):
-    # This is a simplified placeholder. You'll need to adjust this to handle different file types.
-    text = ""
+    ext = os.path.splitext(file_path)[1].lower()
     try:
-        # Ensure file paths are treated as raw strings or replace '\' with '\\'
-        file_path = file_path.replace('\\', '\\\\')  # Replace single backslash with double
-        with open(file_path, 'r', encoding='utf-8') as file:
-            text = file.read()
+        if ext == '.docx':
+            doc = Document(file_path)
+            return '\n'.join([paragraph.text for paragraph in doc.paragraphs if paragraph.text])
+        elif ext in ['.txt', '.md']:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                return file.read()
+        elif ext in ['.pdf', '.xls', '.xlsx', '.doc']:  # using textract for these
+            return textract.process(file_path).decode('utf-8')
     except Exception as e:
         print(f"Failed to read {file_path}: {str(e)}")
-    return text
+    return None
 
 def extract_texts_from_folder(directory):
-    supported_formats = ['.txt', '.md', '.pdf', '.xls']  # Add more as needed
+    supported_formats = ['.txt', '.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx']  # Add more as needed
     texts = []
     file_names = []  # List to hold the names of files being read
     for root, dirs, files in os.walk(directory):
