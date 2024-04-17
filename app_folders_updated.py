@@ -132,13 +132,13 @@ num_testers = st.number_input("Number of Functional Testers", min_value=0, value
 num_test_lead = st.number_input("Number of Test Leads", min_value=0, value=0, step=1)
 num_test_managers = st.number_input("Number of Test Managers", min_value=0, value=0, step=1)
 
-test_automation = st.checkbox("Is Automation Testing Required?")
+test_automation = st.checkbox("Do you have Automation testers?")
 num_automation_testers = st.number_input("Number of Automation Testers", min_value=0, value=0, step=1) if test_automation else 0
 
-performance_testing = st.checkbox("Is Performance Testing Required?")
+performance_testing = st.checkbox("Do you have Performance testers?")
 num_performance_testers = st.number_input("Number of Performance Testers", min_value=0, value=0, step=1) if performance_testing else 0
 
-security_testing = st.checkbox("Is Security Testing Required?")
+security_testing = st.checkbox("Do you have Security testers?")
 num_security_testers = st.number_input("Number of Security Testers", min_value=0, value=0, step=1) if security_testing else 0
 # Directory path input for documents
 
