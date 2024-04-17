@@ -87,8 +87,8 @@ def generate_section(engine, section_name, user_stories, api_key, options):
     raise Exception("Failed to generate section after multiple attempts due to rate limiting.")
 
 
-def generate_test_plan_identifier(engine, api_key, options):
-    """Generate the 'Test Plan Identifier' section with specific metadata."""
+def generate_test_plan_identifier(engine, api_key, options, retries=5, base_delay=1.0):
+    """Generate the 'Test Plan Identifier' section with specific metadata, with retries for handling rate limits."""
     openai.api_key = api_key
     prompt = f"""
     Generate a unique identifier and creator information for a test plan.
@@ -97,20 +97,31 @@ def generate_test_plan_identifier(engine, api_key, options):
     Date: {options['creation_date']}
     Please provide a test plan identifier that includes a unique number and details about who created the test plan and when it was created.
     """
-    try:
-        response = openai.ChatCompletion.create(
-            model=engine,
-            messages=[
-                {"role": "system", "content": "Create a unique identifier for the test plan."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=150,
-            temperature=0.5
-        )
-        return response.choices[0].message['content'].strip()
-    except openai.error.OpenAIError as e:
-        print(f"Failed to generate test plan identifier: {str(e)}")
-        raise
+    for attempt in range(retries):
+        try:
+            response = openai.ChatCompletion.create(
+                model=engine,
+                messages=[
+                    {"role": "system", "content": "Create a unique identifier for the test plan."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=150,
+                temperature=0.5
+            )
+            return response.choices[0].message['content'].strip()
+        except openai.error.RateLimitError:
+            if attempt < retries - 1:
+                sleep_time = base_delay * (2 ** attempt) + random.uniform(0, 1)  # Exponential backoff with jitter
+                print(f"Rate limit exceeded. Retrying in {sleep_time:.2f} seconds...")
+                time.sleep(sleep_time)
+            else:
+                print("Max retries exceeded. Failed to generate test plan identifier.")
+                raise
+        except openai.error.OpenAIError as e:
+            print(f"Failed to generate test plan identifier: {str(e)}")
+            raise
+
+
 
 
 def ai_based_testing_estimation(engine, user_stories, feature_details, num_testers, testing_type, api_key):
@@ -484,3 +495,90 @@ def generate_remaining_test_tasks(engine, api_key, user_stories_text, options):
             attempt_count += 1
 
     return "Failed to generate the remaining test tasks section after multiple attempts."
+
+
+def generate_features_to_be_tested_section(engine, user_stories, api_key, options):
+    """Generate the 'Features to be Tested' section with details about each feature's importance and necessity for testing."""
+    openai.api_key = api_key
+    features, criticalities = extract_main_features_and_criticality(engine, user_stories, api_key)
+
+    feature_details = []
+    max_retries = 3  # Maximum number of retries for each feature
+    for feature, criticality in zip(features, criticalities):
+        attempt_count = 0
+        while attempt_count < max_retries:
+            try:
+                prompt = f"""
+                Feature: {feature}
+                Criticality: {criticality}
+                Explain why this feature is critical to be tested and what risks are involved if it is not thoroughly tested.
+                """
+                response = openai.ChatCompletion.create(
+                    model=engine,
+                    messages=[
+                        {"role": "system", "content": "Generate a detailed explanation for testing a feature."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=150,
+                    temperature=0.5
+                )
+                detail = response.choices[0].message['content'].strip()
+                feature_details.append(f"{feature} ({criticality}): {detail}")
+                break  # Break the loop if successful
+            except openai.error.RateLimitError as e:
+                wait_time = e.retry_after if hasattr(e, 'retry_after') else 10  # Default wait time
+                print(f"Rate limit exceeded for feature {feature}. Retrying in {wait_time} seconds...")
+                time.sleep(wait_time)
+                attempt_count += 1
+            except openai.error.OpenAIError as e:
+                print(f"Failed to generate detail for feature {feature} on attempt {attempt_count + 1}: {str(e)}")
+                attempt_count += 1
+            if attempt_count == max_retries:
+                feature_details.append(
+                    f"{feature} ({criticality}): Detailed explanation could not be generated after multiple attempts.")
+
+    return "\n".join(feature_details)
+
+
+
+def generate_staffing_and_training_needs(engine, user_stories, features, api_key, options):
+    """Generate staffing and training needs based on the complexity of the project."""
+    openai.api_key = api_key
+    attempt_count = 0
+    while attempt_count < 5:  # Limit the number of retries
+        try:
+            prompt = f"""
+            Given the following details of a software project, determine the staffing and training needs for various types of testing:
+            Application Name: {options['application_name']}
+            Domain: {options['domain']}
+            Features: {', '.join(features)}
+            User Stories: {user_stories}
+            Current Technical Stack: {options['tech_stack']}
+            Evaluate how many testers are needed for functional, automation, performance, and security testing. Also, specify the types of training that would be beneficial for the testing team.
+            """
+            response = openai.ChatCompletion.create(
+                model=engine,
+                messages=[
+                    {"role": "system", "content": "Calculate the required testing resources and training needs."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=500,
+                temperature=0.5
+            )
+            return response.choices[0].message['content'].strip()
+        except openai.error.RateLimitError as e:
+            wait_time = e.retry_after if hasattr(e, 'retry_after') else 10  # Default to 10 seconds
+            print(f"Rate limit exceeded. Retrying in {wait_time} seconds...")
+            time.sleep(wait_time)
+            attempt_count += 1
+        except openai.error.OpenAIError as e:
+            print(f"An OpenAI error occurred: {str(e)}")
+            if attempt_count == 4:  # Last attempt
+                raise e  # Optionally raise an error or handle it as needed
+            attempt_count += 1
+        except Exception as e:
+            print(f"Unexpected error: {str(e)}")
+            if attempt_count == 4:  # Last attempt
+                raise e
+            attempt_count += 1
+    return "Unable to generate staffing and training needs after several attempts."

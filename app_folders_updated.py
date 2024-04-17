@@ -1,8 +1,12 @@
 import streamlit as st
 import time
+import re
+from datetime import datetime
 from file_handling.file_reader_folder import extract_texts_from_folder,save_test_plan,download_link
 from pre_processing.keyword_extraction import extract_keywords
-from open_ai.openai_integration_updated import generate_section, list_engines, generate_test_plan_identifier, extract_main_features_and_criticality,ai_based_testing_estimation,generate_excluded_features_section
+from open_ai.openai_integration_updated import generate_section, list_engines, generate_test_plan_identifier, \
+    extract_main_features_and_criticality, ai_based_testing_estimation, generate_excluded_features_section, \
+    generate_features_to_be_tested_section, generate_staffing_and_training_needs
 from pre_processing.sentiment_analysis import assess_sentiment
 from open_ai.openai_integration_updated import generate_test_deliverables_section,generate_environmental_needs_section,generate_schedule_section,generate_responsibilities_section
 from open_ai.openai_integration_updated import generate_introduction_section,generate_glossary_section,generate_remaining_test_tasks
@@ -20,6 +24,11 @@ created_by = st.text_input("Created By")
 approvers = st.text_input("Enter Approvers (comma-separated):")
 reviewers = st.text_input("Enter Reviewers (comma-separated):")
 
+def generate_version_number():
+    return datetime.now().strftime("%Y%m%d%H%M%S")
+
+def sanitize_filename(name):
+    return re.sub(r'[^\w\s-]', '', name).strip().replace(' ', '_')
 # Domain and technical stack selections
 domains = [
     "Telecom Industry", "E-Commerce", "IT Industry", "Marketing, Advertising, Sales", "Government sector",
@@ -78,35 +87,23 @@ def display_all_sections_complete():
         unsafe_allow_html=True
     )
 
-
-def generate_section_prog(section_name, index, total_sections):
-    # Custom style for the section generation message
-    section_status_placeholder.markdown(
-        f"<div style='background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px;'>"
-        f"Generating: **{section_name}**...</div>",
-        unsafe_allow_html=True
-    )
+# Function to simulate the generation of a section
+def generate_section_progress(section_name, index, total_sections):
+    section_status_placeholder.text(f"Generating: **{section_name}**...")
     local_progress = local_progress_placeholder.progress(0)
-    steps = 10  # Simulate steps within each section generation
+    steps = 10  # Number of steps within each section generation
 
     for step in range(steps):
-        time.sleep(0.1)  # Simulate processing
+        time.sleep(0.1)  # Simulate some processing time
         local_progress.progress((step + 1) / steps)
 
     overall_progress_placeholder.progress((index + 1) / total_sections)
-    section_status_placeholder.markdown(
-        f"<div style='background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px;'>"
-        f"Completed: **{section_name}** ✔️</div>",
-        unsafe_allow_html=True
-    )
+    section_status_placeholder.success(f"Completed: **{section_name}** ✔️")
+
 total_sections = len(sections)
 
 if st.button("Extract Text and Generate Test Plan"):
-    overall_status_placeholder.markdown(
-        "<div style='background-color: #2196F3; color: white; padding: 10px; border-radius: 5px;'>"
-        "Preparing the Test Plan...</div>",
-        unsafe_allow_html=True
-    )
+    overall_status_placeholder.info("Preparing the Test Plan...")
     if document_directory:
         extracted_texts, file_names = extract_texts_from_folder(document_directory)
         user_stories_text = "\n\n".join(extracted_texts)
@@ -139,8 +136,9 @@ if st.button("Extract Text and Generate Test Plan"):
         for index, section in enumerate(sections):
             st.subheader(section)
             if section == "Test Plan Identifier":
-                references_text = "Documents:\n" + "\n".join(options['file_names'])
-                references_text += "\n\nReferenced URLs:\n" + "\n".join(options['urls'])
+                references_text = "\n".join(options['file_names'])  # List all file names as references
+                references_text += "\n\nReferenced URLs:\n" + "\n".join(options['urls'])  # Append URLs
+                full_test_plan[section] = references_text
                 full_test_plan[section] = references_text
             elif section == "References":
                 references_text = "\n".join(options['file_names'])  # List all file names as references
@@ -173,6 +171,9 @@ if st.button("Extract Text and Generate Test Plan"):
                     options
                 )
                 full_test_plan[section] = excluded_features_text
+            elif section == "Features to be Tested":
+                included_features_text = generate_features_to_be_tested_section(selected_engine, user_stories_text, api_key, options)
+                full_test_plan[section] = included_features_text
             elif section == "Test Deliverables":
                 deliverables_text = generate_test_deliverables_section(selected_engine, api_key, options)
                 full_test_plan[section] = deliverables_text
@@ -189,6 +190,9 @@ if st.button("Extract Text and Generate Test Plan"):
             elif section == "Introduction":
                 intro_section = generate_introduction_section(selected_engine, api_key, options)
                 full_test_plan[section] = intro_section
+            elif section == "Staffing and Training Needs":
+                staffing_needs = generate_staffing_and_training_needs(selected_engine, user_stories_text, features, api_key, options)
+                full_test_plan[section] = staffing_needs
             elif section == "Glossary":
                 glossery_section = generate_glossary_section(selected_engine, api_key, user_stories_text)
                 full_test_plan[section] = glossery_section
@@ -197,18 +201,17 @@ if st.button("Extract Text and Generate Test Plan"):
                 full_test_plan[section] = remaing_section
             else:
                 full_test_plan[section] = generate_section(selected_engine, section, user_stories_text, api_key, options)
-            generate_section_prog(section, index, total_sections)
+            generate_section_progress(section, index, total_sections)
             st.write(full_test_plan[section])
         display_all_sections_complete()
-        overall_status_placeholder.markdown(
-            "<div style='background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px;'>"
-            "Test Plan generation complete! ✔️</div>",
-            unsafe_allow_html=True
-        )
+        overall_status_placeholder.success("Test Plan generation complete! ✔, Scroll down to end to Test Plan to Download Test Plan!")
         doc = save_test_plan(full_test_plan)
-        link = download_link(doc, "Test_Plan.docx", "Download as Word Document")
+        version_number = generate_version_number()
+        filename = f"{sanitize_filename(application_name)}_v{version_number}_Test_Plan.docx"
+        link = download_link(doc, filename, "Download Test Plan as Word Document")
         st.markdown(link, unsafe_allow_html=True)
     if st.button('Reset'):
         st.experimental_rerun()
     else:
         st.error("Please enter a valid directory path.")
+
