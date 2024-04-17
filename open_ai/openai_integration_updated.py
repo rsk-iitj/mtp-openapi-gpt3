@@ -105,7 +105,7 @@ def generate_test_plan_identifier(engine, api_key, options, retries=5, base_dela
                     {"role": "system", "content": "Create a unique identifier for the test plan."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=150,
+                max_tokens=300,
                 temperature=0.5
             )
             return response.choices[0].message['content'].strip()
@@ -142,7 +142,7 @@ def ai_based_testing_estimation(engine, user_stories, feature_details, num_teste
                     {"role": "system", "content": "Calculate testing effort based on the details provided."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=200,
+                max_tokens=500,
                 temperature=0.5
             )
             estimated_effort = response.choices[0].message['content'].strip()
@@ -358,7 +358,7 @@ def generate_responsibilities_section(engine, api_key, options):
                     {"role": "system", "content": "Generate detailed responsibilities for testing roles."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=300,
+                max_tokens=500,
                 temperature=0.5
             )
             role_responsibilities = response.choices[0].message['content']
@@ -393,7 +393,7 @@ def generate_introduction_section(engine, api_key, options):
                     {"role": "system", "content": "Generate an introduction for the test plan."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=300,
+                max_tokens=500,
                 temperature=0.5
             )
             return response.choices[0].message['content']
@@ -478,7 +478,7 @@ def generate_remaining_test_tasks(engine, api_key, user_stories_text, options):
                     {"role": "system", "content": "Generate a detailed list of remaining testing tasks."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=300,  # Sufficient tokens to cover detailed tasks
+                max_tokens=500,  # Sufficient tokens to cover detailed tasks
                 temperature=0.5
             )
             return response.choices[0].message['content']
@@ -523,7 +523,7 @@ def generate_features_to_be_tested_section(engine, user_stories, api_key, option
                         {"role": "system", "content": "Generate a detailed explanation for testing a feature."},
                         {"role": "user", "content": prompt}
                     ],
-                    max_tokens=150,
+                    max_tokens=500,
                     temperature=0.5
                 )
                 detail = response.choices[0].message['content'].strip()
