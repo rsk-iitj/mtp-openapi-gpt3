@@ -1,6 +1,7 @@
 import os
-from docx import Document
 import base64
+from docx import Document
+import re
 from io import BytesIO
 
 def extract_text_from_file(file_path):
@@ -29,11 +30,34 @@ def extract_texts_from_folder(directory):
                     file_names.append(file)  # Add the file name to the list
     return texts, file_names
 
+
+
 def save_test_plan(full_test_plan):
     doc = Document()
     for section, content in full_test_plan.items():
-        doc.add_heading(section, level=1)
-        doc.add_paragraph(content)
+        # Add main section heading from the dictionary key
+        doc.add_heading(section, level=2)
+
+        # Split content by lines for fine-grained processing
+        lines = content.split('\n')
+        for line in lines:
+            # Skip empty lines
+            if not line.strip():
+                continue
+            # Handling Markdown-style headings within the section content
+            if line.startswith('### '):
+                doc.add_heading(line.replace('### ', ''), level=3)
+            elif line.startswith('#### '):
+                doc.add_heading(line.replace('#### ', ''), level=4)
+            else:
+                # Process the paragraph and handle bold formatting
+                p = doc.add_paragraph()
+                for part in re.split(r'(\*\*[^*]+\*\*)', line):  # Split and keep the bold parts
+                    if part.startswith('**') and part.endswith('**'):
+                        part = part[2:-2]  # Remove the asterisks
+                        p.add_run(part).bold = True
+                    else:
+                        p.add_run(part)
     return doc
 
 def download_link(doc, filename, text):
