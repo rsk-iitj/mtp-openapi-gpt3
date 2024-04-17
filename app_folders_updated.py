@@ -21,8 +21,64 @@ selected_engine = st.selectbox("Select an OpenAI engine:", engines)
 application_name = st.text_input("Enter the Application Name:")
 creation_date = st.date_input("Creation Date")
 created_by = st.text_input("Created By")
-approvers = st.text_input("Enter Approvers (comma-separated):")
-reviewers = st.text_input("Enter Reviewers (comma-separated):")
+
+if 'approvers' not in st.session_state:
+    st.session_state['approvers'] = []
+if 'reviewers' not in st.session_state:
+    st.session_state['reviewers'] = []
+
+def format_person_info(person):
+    # Handle 'To be Decided' dates and properly formatted dates
+    date = person['date']
+    if date == 'To be Decided':
+        formatted_date = date
+    else:
+        formatted_date = datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m-%d')
+    return f"Name: {person['name']}, Role: {person['role']}, Date: {formatted_date}"
+
+def add_person(category, name, role, date):
+    # Store the date directly if 'To be Decided'
+    date_to_store = 'To be Decided' if date == 'To be Decided' else date.strftime('%Y-%m-%d')
+    st.session_state[category].append({
+        'name': name,
+        'role': role,
+        'date': date_to_store
+    })
+
+def display_people(category):
+    if st.session_state[category]:
+        for person in st.session_state[category]:
+            st.text(format_person_info(person))
+
+# Form for Approvers
+with st.form("approvers_form"):
+    approver_name = st.text_input("Approver Name", key="app_name")
+    approver_role = st.text_input("Approver Role", key="app_role")
+    date_tbd = st.checkbox("Date To be Decided", key="app_date_tbd")
+    approver_date = st.date_input("Approval Date", key="app_date") if not date_tbd else 'To be Decided'
+    submitted1 = st.form_submit_button("Add Approver")
+    if submitted1:
+        add_person('approvers', approver_name, approver_role, approver_date)
+        st.success("Approver added successfully!")
+        display_people('approvers')
+
+# Form for Reviewers
+with st.form("reviewers_form"):
+    reviewer_name = st.text_input("Reviewer Name", key="rev_name")
+    reviewer_role = st.text_input("Reviewer Role", key="rev_role")
+    date_tbd = st.checkbox("Date To be Decided", key="rev_date_tbd")
+    reviewer_date = st.date_input("Review Date", key="rev_date") if not date_tbd else 'To be Decided'
+    submitted2 = st.form_submit_button("Add Reviewer")
+    if submitted2:
+        add_person('reviewers', reviewer_name, reviewer_role, reviewer_date)
+        st.success("Reviewer added successfully!")
+        display_people('reviewers')
+
+def generate_approvals_text():
+    approvers_text = "Approvers:\n" + "\n".join(format_person_info(person) for person in st.session_state['approvers'])
+    reviewers_text = "Reviewers:\n" + "\n".join(format_person_info(person) for person in st.session_state['reviewers'])
+    return approvers_text + "\n\n" + reviewers_text
+
 
 def generate_version_number():
     return datetime.now().strftime("%Y%m%d%H%M%S")
@@ -93,7 +149,7 @@ def display_all_sections_complete():
 
 # Function to simulate the generation of a section
 def generate_section_progress(section_name, index, total_sections):
-    section_status_placeholder.text(f"Generating: **{section_name}**...")
+    section_status_placeholder.info(f"Generating Section: **{section_name}**...")
     local_progress = local_progress_placeholder.progress(0)
     steps = 10  # Number of steps within each section generation
 
@@ -102,11 +158,11 @@ def generate_section_progress(section_name, index, total_sections):
         local_progress.progress((step + 1) / steps)
 
     overall_progress_placeholder.progress((index + 1) / total_sections)
-    section_status_placeholder.success(f"Completed: **{section_name}** ✔️")
+    section_status_placeholder.success(f"Completed Section: **{section_name}** ✔️")
 
 total_sections = len(sections)
 
-if st.button("Extract Text and Generate Test Plan"):
+if st.button("Generate Test Plan"):
     overall_status_placeholder.info("Preparing the Test Plan...")
     if document_directory:
         extracted_texts, file_names = extract_texts_from_folder(document_directory)
@@ -130,9 +186,11 @@ if st.button("Extract Text and Generate Test Plan"):
             'num_security_testers': num_security_testers,
             'num_test_managers': num_test_managers,
             'keywords': ', '.join(keywords), 'features': features, 'criticalities': criticalities,
-            'approvers': approvers.split(','),
-            'reviewers': reviewers.split(','),
+            'approvers': st.session_state['approvers'],
+            'reviewers': st.session_state['reviewers'],
             'file_names': file_names,
+            'performance_testing':performance_testing,
+            'security_testing':security_testing,
             "urls":urls
         }
 
@@ -158,7 +216,9 @@ if st.button("Extract Text and Generate Test Plan"):
 
                 full_test_plan['References'] = references_text
             elif section == "Approvals":
-                approvals_text = "Approvers:\n" + "\n".join(options['approvers']) + "\n\n" + "Reviewers:\n" + "\n".join(options['reviewers'])
+                approvals_text =""
+                if 'approvers' in st.session_state and 'reviewers' in st.session_state:
+                    approvals_text = generate_approvals_text()
                 full_test_plan[section] = approvals_text
             elif section == "Test Estimation":
                 estimation_texts = []
@@ -218,14 +278,14 @@ if st.button("Extract Text and Generate Test Plan"):
             generate_section_progress(section, index, total_sections)
             st.write(full_test_plan[section])
         display_all_sections_complete()
-        overall_status_placeholder.success("Test Plan generation complete! ✔, Scroll down to end to Test Plan to Download Test Plan!")
+        overall_status_placeholder.success("Test Plan generation complete! ✔, Scroll down to end of Test Plan to Download Test Plan!")
         doc = save_test_plan(full_test_plan)
         version_number = generate_version_number()
         filename = f"{sanitize_filename(application_name)}_v{version_number}_Test_Plan.docx"
         link = download_link(doc, filename, "Download Test Plan as Word Document")
         st.markdown(link, unsafe_allow_html=True)
-    if st.button('Reset'):
-        st.experimental_rerun()
+        if st.button('Reset'):
+            st.experimental_rerun()
     else:
         st.error("Please enter a valid directory path.")
 

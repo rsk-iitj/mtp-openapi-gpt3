@@ -40,6 +40,7 @@ def download_link(doc, filename, text):
     # Generate download link for the document
     buffer = BytesIO()
     doc.save(buffer)
+    buffer.seek(0)  # Reset buffer position to the start of the stream
     b64 = base64.b64encode(buffer.getvalue()).decode()
     href = f'<a href="data:application/octet-stream;base64,{b64}" download="{filename}">{text}</a>'
     return href
