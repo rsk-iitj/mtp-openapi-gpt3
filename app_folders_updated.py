@@ -49,6 +49,10 @@ sections = [
 ]
 selected_domain = st.selectbox("Select the application domain:", domains)
 reference_urls = st.text_area("Enter reference URLs (comma-separated if multiple):")
+if reference_urls.strip():  # Checks if there's any non-whitespace character
+    urls = [url.strip() for url in re.split(r'[,\n]+', reference_urls) if url.strip()]
+else:
+    urls = []
 tech_stack = {
     "Frontend Technology": st.selectbox("Select Frontend Technology", ["React", "Angular", "Vue", "Other"]),
     "Backend Technology": st.selectbox("Select Backend Technology", ["Node.js", "Python", "Java", "Other"]),
@@ -128,7 +132,8 @@ if st.button("Extract Text and Generate Test Plan"):
             'keywords': ', '.join(keywords), 'features': features, 'criticalities': criticalities,
             'approvers': approvers.split(','),
             'reviewers': reviewers.split(','),
-            'file_names': file_names
+            'file_names': file_names,
+            "urls":urls
         }
 
 
@@ -136,13 +141,22 @@ if st.button("Extract Text and Generate Test Plan"):
         for index, section in enumerate(sections):
             st.subheader(section)
             if section == "Test Plan Identifier":
-                references_text = "\n".join(options['file_names'])  # List all file names as references
-                references_text += "\n\nReferenced URLs:\n" + "\n".join(options['urls'])  # Append URLs
-                full_test_plan[section] = references_text
-                full_test_plan[section] = references_text
+                test_plan_iden =  generate_test_plan_identifier(selected_engine, api_key, options, retries=5, base_delay=1.0)
+                full_test_plan[section] = test_plan_iden
             elif section == "References":
-                references_text = "\n".join(options['file_names'])  # List all file names as references
-                full_test_plan[section] = references_text
+                references_text = "Documents:\n"
+                if options['file_names']:
+                    references_text += "\n".join(f"{i + 1}. {name}" for i, name in enumerate(options['file_names']))
+                else:
+                    references_text += "No documents available."
+
+                if options['urls']:
+                    references_text += "\n\nReferenced URLs:\n" + "\n".join(
+                        f"{i + 1}. {url}" for i, url in enumerate(options['urls']))
+                else:
+                    references_text += "\n\nNo referenced URLs provided."
+
+                full_test_plan['References'] = references_text
             elif section == "Approvals":
                 approvals_text = "Approvers:\n" + "\n".join(options['approvers']) + "\n\n" + "Reviewers:\n" + "\n".join(options['reviewers'])
                 full_test_plan[section] = approvals_text
