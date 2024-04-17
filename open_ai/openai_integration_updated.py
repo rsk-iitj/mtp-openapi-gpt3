@@ -1,3 +1,4 @@
+from random import random
 import openai
 import time
 
@@ -270,8 +271,7 @@ def generate_environmental_needs_section(engine, api_key, options):
         print(f"An OpenAI error occurred: {str(e)}")
         raise
 
-# Then in your Streamlit app, when generating the section:
-import openai
+
 
 def generate_schedule_section(engine, api_key, options):
     """Generate detailed schedules for various types of testing based on availability and testing needs."""
@@ -317,7 +317,7 @@ def generate_schedule_section(engine, api_key, options):
     return "\n\n".join(schedules)
 
 
-import openai
+
 
 def generate_responsibilities_section(engine, api_key, options):
     """Generate responsibilities based on the team composition and testing requirements."""
@@ -369,8 +369,7 @@ def generate_responsibilities_section(engine, api_key, options):
 
     return "\n\n".join(responsibilities)
 
-import openai
-import time
+
 
 def generate_introduction_section(engine, api_key, options):
     """Generate an introduction section that describes the application, its domain, tech stack, and the objectives of the test plan with retry logic."""
