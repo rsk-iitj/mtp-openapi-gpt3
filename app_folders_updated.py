@@ -18,10 +18,14 @@ engines = list_engines(api_key)
 selected_engine = st.selectbox("Select an OpenAI engine:", engines)
 
 # Application name and document handling inputs
-application_name = st.text_input("Enter the Application Name:")
+def custom_header(text, level=2, size='16px'):
+    st.markdown(f'<h{level} style="font-size: {size};">{text}</h{level}>', unsafe_allow_html=True)
+
+custom_header("Author Details", level=3, size='22px')
 creation_date = st.date_input("Creation Date")
 created_by = st.text_input("Created By")
 
+custom_header("Approver Section", level=3, size='22px')
 if 'approvers' not in st.session_state:
     st.session_state['approvers'] = []
 if 'reviewers' not in st.session_state:
@@ -86,6 +90,10 @@ def generate_version_number():
 def sanitize_filename(name):
     return re.sub(r'[^\w\s-]', '', name).strip().replace(' ', '_')
 # Domain and technical stack selections
+
+custom_header("Application Section", level=3, size='22px')
+
+application_name = st.text_input("Enter the Application Name:")
 domains = [
     "Telecom Industry", "E-Commerce", "IT Industry", "Marketing, Advertising, Sales", "Government sector",
     "Media & Entertainment", "Travel & Tourism", "IoT & Geofencing", "Finances",
@@ -103,12 +111,11 @@ sections = [
     "Environmental Needs", "Staffing and Training Needs", "Responsibilities", "Schedule",
     "Planning Risks and Contingencies", "Test Estimation", "Glossary"
 ]
+
 selected_domain = st.selectbox("Select the application domain:", domains)
-reference_urls = st.text_area("Enter reference URLs (comma-separated if multiple):")
-if reference_urls.strip():  # Checks if there's any non-whitespace character
-    urls = [url.strip() for url in re.split(r'[,\n]+', reference_urls) if url.strip()]
-else:
-    urls = []
+
+custom_header("Technology Stack", level=3, size='18px')
+
 tech_stack = {
     "Frontend Technology": st.selectbox("Select Frontend Technology", ["React", "Angular", "Vue", "Other"]),
     "Backend Technology": st.selectbox("Select Backend Technology", ["Node.js", "Python", "Java", "Other"]),
@@ -120,6 +127,7 @@ tech_stack = {
 
 # Automation and resources
 
+custom_header("Existing Team Details", level=3, size='22px')
 num_testers = st.number_input("Number of Functional Testers", min_value=0, value=0, step=1)
 num_test_lead = st.number_input("Number of Test Leads", min_value=0, value=0, step=1)
 num_test_managers = st.number_input("Number of Test Managers", min_value=0, value=0, step=1)
@@ -133,7 +141,16 @@ num_performance_testers = st.number_input("Number of Performance Testers", min_v
 security_testing = st.checkbox("Is Security Testing Required?")
 num_security_testers = st.number_input("Number of Security Testers", min_value=0, value=0, step=1) if security_testing else 0
 # Directory path input for documents
-document_directory = st.text_input("Enter the directory path to scan for documents:")
+
+custom_header("Reference Section", level=3, size='22px')
+reference_urls = st.text_area("Enter reference URLs (comma-separated if multiple):")
+if reference_urls.strip():  # Checks if there's any non-whitespace character
+    urls = [url.strip() for url in re.split(r'[,\n]+', reference_urls) if url.strip()]
+else:
+    urls = []
+custom_header("Upload the documents", level=3, size='22px')
+
+document_directory = st.text_input("Enter the directory path to scan for all requirements & design documents:")
 
 section_status_placeholder = st.empty()
 local_progress_placeholder = st.empty()
