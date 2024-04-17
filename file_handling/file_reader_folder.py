@@ -4,6 +4,8 @@ from docx import Document
 import re
 from io import BytesIO
 import textract
+import pandas as pd
+import pdfplumber
 
 def extract_text_from_file(file_path):
     ext = os.path.splitext(file_path)[1].lower()
@@ -14,16 +16,31 @@ def extract_text_from_file(file_path):
         elif ext in ['.txt', '.md']:
             with open(file_path, 'r', encoding='utf-8') as file:
                 return file.read()
-        elif ext in ['.pdf', '.xls', '.xlsx', '.doc']:  # using textract for these
-            return textract.process(file_path).decode('utf-8')
+        elif ext == '.pdf':
+            with pdfplumber.open(file_path) as pdf:
+                pages = [page.extract_text() for page in pdf.pages]
+                return '\n'.join(pages) if pages else None
+        elif ext in ['.xls', '.xlsx']:
+            # Read the Excel file and concatenate all cells into a single string
+            df = pd.read_excel(file_path)
+            return df.to_string(header=True, index=False)
+        elif ext == '.doc':
+            # Handling .doc files requires additional dependencies and setup
+            return handle_doc_file(file_path)
     except Exception as e:
         print(f"Failed to read {file_path}: {str(e)}")
     return None
 
+def handle_doc_file(file_path):
+    # This is a placeholder for handling .doc files; you might need to adjust based on your environment
+    # textract approach (requires installation of antiword or similar on non-Windows systems)
+    import textract
+    return textract.process(file_path).decode('utf-8')
+
 def extract_texts_from_folder(directory):
-    supported_formats = ['.txt', '.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx']  # Add more as needed
+    supported_formats = ['.txt', '.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx']
     texts = []
-    file_names = []  # List to hold the names of files being read
+    file_names = []
     for root, dirs, files in os.walk(directory):
         for file in files:
             if any(file.lower().endswith(ext) for ext in supported_formats):
@@ -31,7 +48,7 @@ def extract_texts_from_folder(directory):
                 file_text = extract_text_from_file(file_path)
                 if file_text:
                     texts.append(file_text)
-                    file_names.append(file)  # Add the file name to the list
+                    file_names.append(file)
     return texts, file_names
 
 

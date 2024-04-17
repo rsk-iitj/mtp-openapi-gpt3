@@ -5,4 +5,5 @@ pdfplumber==0.11.0
 python_docx==1.1.0
 streamlit==1.32.0
 textblob==0.18.0.post0
+textract==1.6.5
 transformers==4.39.3
