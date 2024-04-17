@@ -375,10 +375,13 @@ import time
 def generate_introduction_section(engine, api_key, options):
     """Generate an introduction section that describes the application, its domain, tech stack, and the objectives of the test plan with retry logic."""
     openai.api_key = api_key
+    # Constructing the tech stack description with specific technology names
+    tech_stack_description = ', '.join([f"{tech}: {value}" for tech, value in options['tech_stack'].items() if value and value != 'Other'])
+
     prompt = f"""
     Application Name: {options['application_name']}
     Domain: {options['domain']}
-    Tech Stack: {', '.join([tech for tech, value in options['tech_stack'].items() if value != 'Other'])}
+    Tech Stack: {tech_stack_description}
     Describe the application's main functionality and its relevance to the specified domain. Outline the objectives of the test plan, focusing on how the testing will ensure the application meets its design and functionality requirements.
     """
     attempt_count = 0
@@ -411,6 +414,7 @@ def generate_introduction_section(engine, api_key, options):
             attempt_count += 1
 
     return "Failed to generate the introduction section after multiple attempts."
+
 
 
 
