@@ -390,6 +390,7 @@ def generate_test_plan():
     if st.session_state['features_extracted']:
             overall_status_placeholder = st.empty()
             overall_status_placeholder.info("Preparing the Test Plan...")
+
             full_test_plan = generate_test_plan_section()
             display_all_sections_complete()
             st.session_state['test_plan_generated'] = True
@@ -400,7 +401,18 @@ def generate_test_plan():
 # Button to trigger the test plan generation
 if st.session_state['features_extracted'] and not st.session_state['test_plan_generated']:
     if st.button("Generate Test Plan"):
+        start_time = time.time()
         full_test_plan = generate_test_plan()
+        end_time = time.time()
+        elapsed_time = (end_time - start_time)/60
+        st.markdown(f"""
+        <div style='text-align: left;'>
+            <h4 style='color: 	#33cccc;'>
+                Total Time to Generate the Test Plan:
+                <strong>{elapsed_time:.2f} minutes</strong>
+            </h4>
+        </div>
+        """, unsafe_allow_html=True)
 
 # Display additional information and actions after the test plan is generated
 if st.session_state['test_plan_generated']:
