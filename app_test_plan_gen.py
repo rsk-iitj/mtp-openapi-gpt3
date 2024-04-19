@@ -1,3 +1,5 @@
+import random
+
 import streamlit as st
 import time
 import re
@@ -368,7 +370,7 @@ def generate_test_plan_section():
                                                                options)
                 steps = 10  # Number of steps within each section generation
                 for step in range(steps):
-                    time.sleep(0.5)  # Simulate some processing time
+                    time.sleep(random.random())  # Simulate some processing time
                     local_progress.progress((step + 1) / steps)
             local_progress.progress(100)
             overall_progress_placeholder.progress((index + 1) / total_sections)
@@ -408,4 +410,20 @@ if st.session_state['test_plan_generated']:
     link = download_link(doc, filename, "Download Test Plan as Word Document")
     st.markdown(link, unsafe_allow_html=True)
     if st.button('Reset'):
+        # Clear the entire session state
+        st.session_state.clear()
+        # Optionally re-initialize any necessary defaults
+        st.session_state['init'] = True
+        st.session_state['texts_extracted'] = False
+        st.session_state['features_extracted'] = False
+        st.session_state['test_plan_generated'] = False
+        st.session_state['file_names'] = []
+        st.session_state['user_stories_text'] = ''
+        st.session_state['features'] = []
+        st.session_state['criticalities'] = []
+        st.session_state['keywords'] = []
+        st.session_state['approvers'] = []
+        st.session_state['reviewers'] = []
+        st.session_state['document_directory'] = ""
+        # Rerun the app from the top after resetting the state
         st.experimental_rerun()
