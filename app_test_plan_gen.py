@@ -407,7 +407,7 @@ if st.session_state['features_extracted'] and not st.session_state['test_plan_ge
         elapsed_time = (end_time - start_time)/60
         st.markdown(f"""
         <div style='text-align: left;'>
-            <h4 style='color: 	#33cccc;'>
+            <h4 style='color: 	#00b8e6;'>
                 Total Time to Generate the Test Plan:
                 <strong>{elapsed_time:.2f} minutes</strong>
             </h4>
