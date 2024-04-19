@@ -206,7 +206,7 @@ def extract_features_and_keywords():
 
 # Initial extraction and display
 if not st.session_state.get('texts_extracted', False):
-    if st.button("Extract User Stories"):
+    if st.button("Extract Requirements"):
         extract_user_stories()
 
 # Button to extract features and keywords
@@ -265,102 +265,115 @@ def generate_test_plan_section():
     with st.spinner('Please wait...Processing!'):
         st.markdown("## Test Plan")
         for index, section in enumerate(sections):
-            st.subheader(section)
-            if section == "Test Plan Identifier":
-                test_plan_iden = generate_test_plan_identifier(selected_engine, api_key, options, retries=5,
-                                                               base_delay=1.0)
-                full_test_plan[section] = test_plan_iden
-            elif section == "References":
-                references_text = "Documents:\n"
-                if options['file_names']:
-                    references_text += "\n".join(
-                        f"{i + 1}. {name}" for i, name in enumerate(options['file_names']))
-                else:
-                    references_text += "No documents available."
+            local_progress_placeholder = st.empty()
+            # Display generating status
+            section_status_placeholder = st.empty()
+            section_status_placeholder.info(f"Generating Section: **{section}**...")
+            local_progress = local_progress_placeholder.progress(0)
+            with st.spinner("Please wait...Processing... !"):
+                st.subheader(section)
+                if section == "Test Plan Identifier":
+                    test_plan_iden = generate_test_plan_identifier(selected_engine, api_key, options, retries=5,
+                                                                   base_delay=1.0)
+                    full_test_plan[section] = test_plan_iden
+                elif section == "References":
+                    references_text = "Documents:\n"
+                    if options['file_names']:
+                        references_text += "\n".join(
+                            f"{i + 1}. {name}" for i, name in enumerate(options['file_names']))
+                    else:
+                        references_text += "No documents available."
 
-                if options['urls']:
-                    references_text += "\n\nReferenced URLs:\n" + "\n".join(
-                        f"{i + 1}. {url}" for i, url in enumerate(options['urls']))
-                else:
-                    references_text += "\n\nNo referenced URLs provided."
+                    if options['urls']:
+                        references_text += "\n\nReferenced URLs:\n" + "\n".join(
+                            f"{i + 1}. {url}" for i, url in enumerate(options['urls']))
+                    else:
+                        references_text += "\n\nNo referenced URLs provided."
 
-                full_test_plan['References'] = references_text
-            elif section == "Approvals":
-                approvals_text = ""
-                if 'approvers' in st.session_state and 'reviewers' in st.session_state:
-                    approvals_text = generate_approvals_text()
-                full_test_plan[section] = approvals_text
-            elif section == "Test Estimation":
-                estimation_texts = []
-                if test_automation:
-                    estimation_texts.append(
-                        ai_based_testing_estimation(selected_engine, user_stories_text, features,
-                                                    num_automation_testers, "Automation Testing", api_key))
-                else:
-                    estimation_texts.append(
-                        "Estimation for Automation Testing was not done as it was not chosen to be estimated.")
-                if performance_testing:
-                    estimation_texts.append(
-                        ai_based_testing_estimation(selected_engine, user_stories_text, features,
-                                                    num_performance_testers, "Performance Testing", api_key))
-                else:
-                    estimation_texts.append(
-                        "Estimation for Security Testing was not done as it was not chosen to be estimated.")
-                if security_testing:
-                    estimation_texts.append(
-                        ai_based_testing_estimation(selected_engine, user_stories_text, features,
-                                                    num_security_testers, "Security Testing", api_key))
-                else:
-                    estimation_texts.append(
-                        "Estimation for Security Testing was not done as it was not chosen to be estimated.")
-                full_test_plan[section] = "\n\n".join(estimation_texts)
-            elif section == "Features not to be Tested":
-                excluded_features_text = generate_excluded_features_section(
-                    selected_engine,
-                    "Features not to be Tested",
-                    user_stories_text,
-                    features,
-                    api_key,
-                    options
-                )
-                full_test_plan[section] = excluded_features_text
-            elif section == "Features to be Tested":
-                included_features_text = generate_features_to_be_tested_section(selected_engine,
-                                                                                user_stories_text, api_key,
-                                                                                options)
-                full_test_plan[section] = included_features_text
-            elif section == "Test Deliverables":
-                deliverables_text = generate_test_deliverables_section(selected_engine, api_key, options)
-                full_test_plan[section] = deliverables_text
-            elif section == "Environmental Needs":
-                environmental_needs_text = generate_environmental_needs_section(selected_engine, api_key,
-                                                                                options)
-                full_test_plan[section] = environmental_needs_text
-            elif section == "Schedule":
-                schedule_section = generate_schedule_section(selected_engine, api_key, options)
-                full_test_plan[section] = schedule_section
-            elif section == "Responsibilities":
-                responsibility_section = generate_responsibilities_section(selected_engine, api_key, options)
-                full_test_plan[section] = responsibility_section
+                    full_test_plan['References'] = references_text
+                elif section == "Approvals":
+                    approvals_text = ""
+                    if 'approvers' in st.session_state and 'reviewers' in st.session_state:
+                        approvals_text = generate_approvals_text()
+                    full_test_plan[section] = approvals_text
+                elif section == "Test Estimation":
+                    estimation_texts = []
+                    if test_automation:
+                        estimation_texts.append(
+                            ai_based_testing_estimation(selected_engine, user_stories_text, features,
+                                                        num_automation_testers, "Automation Testing", api_key))
+                    else:
+                        estimation_texts.append(
+                            "Estimation for Automation Testing was not done as it was not chosen to be estimated.")
+                    if performance_testing:
+                        estimation_texts.append(
+                            ai_based_testing_estimation(selected_engine, user_stories_text, features,
+                                                        num_performance_testers, "Performance Testing", api_key))
+                    else:
+                        estimation_texts.append(
+                            "Estimation for Security Testing was not done as it was not chosen to be estimated.")
+                    if security_testing:
+                        estimation_texts.append(
+                            ai_based_testing_estimation(selected_engine, user_stories_text, features,
+                                                        num_security_testers, "Security Testing", api_key))
+                    else:
+                        estimation_texts.append(
+                            "Estimation for Security Testing was not done as it was not chosen to be estimated.")
+                    full_test_plan[section] = "\n\n".join(estimation_texts)
+                elif section == "Features not to be Tested":
+                    excluded_features_text = generate_excluded_features_section(
+                        selected_engine,
+                        "Features not to be Tested",
+                        user_stories_text,
+                        features,
+                        api_key,
+                        options
+                    )
+                    full_test_plan[section] = excluded_features_text
+                elif section == "Features to be Tested":
+                    included_features_text = generate_features_to_be_tested_section(selected_engine,
+                                                                                    user_stories_text, api_key,
+                                                                                    options)
+                    full_test_plan[section] = included_features_text
+                elif section == "Test Deliverables":
+                    deliverables_text = generate_test_deliverables_section(selected_engine, api_key, options)
+                    full_test_plan[section] = deliverables_text
+                elif section == "Environmental Needs":
+                    environmental_needs_text = generate_environmental_needs_section(selected_engine, api_key,
+                                                                                    options)
+                    full_test_plan[section] = environmental_needs_text
+                elif section == "Schedule":
+                    schedule_section = generate_schedule_section(selected_engine, api_key, options)
+                    full_test_plan[section] = schedule_section
+                elif section == "Responsibilities":
+                    responsibility_section = generate_responsibilities_section(selected_engine, api_key, options)
+                    full_test_plan[section] = responsibility_section
 
-            elif section == "Introduction":
-                intro_section = generate_introduction_section(selected_engine, api_key, options)
-                full_test_plan[section] = intro_section
-            elif section == "Staffing and Training Needs":
-                staffing_needs = generate_staffing_and_training_needs(selected_engine, user_stories_text,
-                                                                      features, api_key, options)
-                full_test_plan[section] = staffing_needs
-            elif section == "Glossary":
-                glossery_section = generate_glossary_section(selected_engine, api_key, user_stories_text)
-                full_test_plan[section] = glossery_section
-            elif section == "Remaining Test Tasks":
-                remaing_section = generate_remaining_test_tasks(selected_engine, api_key, user_stories_text,
-                                                                options)
-                full_test_plan[section] = remaing_section
-            else:
-                full_test_plan[section] = generate_section(selected_engine, section, user_stories_text, api_key,
-                                                           options)
-            generate_section_progress(section, index, total_sections)
+                elif section == "Introduction":
+                    intro_section = generate_introduction_section(selected_engine, api_key, options)
+                    full_test_plan[section] = intro_section
+                elif section == "Staffing and Training Needs":
+                    staffing_needs = generate_staffing_and_training_needs(selected_engine, user_stories_text,
+                                                                          features, api_key, options)
+                    full_test_plan[section] = staffing_needs
+                elif section == "Glossary":
+                    glossery_section = generate_glossary_section(selected_engine, api_key, user_stories_text)
+                    full_test_plan[section] = glossery_section
+                elif section == "Remaining Test Tasks":
+                    remaing_section = generate_remaining_test_tasks(selected_engine, api_key, user_stories_text,
+                                                                    options)
+                    full_test_plan[section] = remaing_section
+                else:
+                    full_test_plan[section] = generate_section(selected_engine, section, user_stories_text, api_key,
+                                                               options)
+                steps = 10  # Number of steps within each section generation
+                for step in range(steps):
+                    time.sleep(0.5)  # Simulate some processing time
+                    local_progress.progress((step + 1) / steps)
+            local_progress.progress(100)
+            overall_progress_placeholder.progress((index + 1) / total_sections)
+            section_status_placeholder.success(f"Completed Section: **{section}** ✔️")
+            # Clear local progress
             st.write(full_test_plan[section])
     return full_test_plan
 
@@ -373,8 +386,6 @@ def display_all_sections_complete():
 
 def generate_test_plan():
     if st.session_state['features_extracted']:
-        # Show spinner and update status right after button press
-            # This placeholder will now show the "Preparing the Test Plan..." right after clicking the button
             overall_status_placeholder = st.empty()
             overall_status_placeholder.info("Preparing the Test Plan...")
             full_test_plan = generate_test_plan_section()
