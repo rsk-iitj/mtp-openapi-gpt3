@@ -270,7 +270,7 @@ def generate_test_plan_section():
             section_status_placeholder = st.empty()
             section_status_placeholder.info(f"Generating Section: **{section}**...")
             local_progress = local_progress_placeholder.progress(0)
-            with st.spinner("Please wait...Processing... !"):
+            with st.spinner("Please wait...Processing....."):
                 st.subheader(section)
                 if section == "Test Plan Identifier":
                     test_plan_iden = generate_test_plan_identifier(selected_engine, api_key, options, retries=5,

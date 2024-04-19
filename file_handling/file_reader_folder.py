@@ -57,7 +57,7 @@ def save_test_plan(full_test_plan):
     doc = Document()
     for section, content in full_test_plan.items():
         # Add main section heading from the dictionary key
-        doc.add_heading(section, level=2)
+        doc.add_heading(section, level=1)
 
         # Split content by lines for fine-grained processing
         lines = content.split('\n')
@@ -66,7 +66,9 @@ def save_test_plan(full_test_plan):
             if not line.strip():
                 continue
             # Handling Markdown-style headings within the section content
-            if line.startswith('### '):
+            if line.startswith('## '):
+                doc.add_heading(line.replace('## ', ''), level=2)
+            elif line.startswith('### '):
                 doc.add_heading(line.replace('### ', ''), level=3)
             elif line.startswith('#### '):
                 doc.add_heading(line.replace('#### ', ''), level=4)
