@@ -3,7 +3,8 @@ import pandas as pd
 import json
 from datetime import datetime
 import sys
-
+import os
+import sqlite3
 
 def sanitize_filename(name):
     """Sanitize the filename to avoid path traversal or illegal characters."""
@@ -17,20 +18,31 @@ def load_test_plan_data(filename):
     return data
 
 
-def save_feedback(feedback_data, application_name):
+def save_feedback(feedback_data, application_name, model_name):
+    base_dir = "output/feedback"
+    app_dir = os.path.join(base_dir, sanitize_filename(application_name))
+    # Ensure the directory exists, if not create it
+    os.makedirs(app_dir, exist_ok=True)
+
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     filename = f"{sanitize_filename(application_name)}_test_plan_feedback_{timestamp}.csv"
+    # Construct full path to save the file
+    full_path = os.path.join(app_dir, filename)
+
+    # Create a DataFrame and add the model name as a column
     df = pd.DataFrame(feedback_data)
-    df.to_csv(filename, index=False)
-    st.success(f"Feedback submitted successfully and saved to '{filename}'.")
+    df['Model Name'] = model_name  # Add the model name for each feedback entry
+
+    df.to_csv(full_path, index=False)
+    st.success(f"Feedback submitted successfully and saved to '{full_path}'.")
 
 
 def feedback_app():
-    st.title("Feedback for Test Plan")
-
-    # Use sys.argv to get the filename passed as an argument
     try:
-        filename = sys.argv[1]  # Assumes the filename is the first argument
+        filename = sys.argv[1]
+        session_id = sys.argv[2]
+        doc_id = sys.argv[3]# Assumes the filename is the first argument
+        model_used = sys.argv[4]
     except IndexError:
         st.error("No filename provided. Please launch this app with a filename argument.")
         return
@@ -38,10 +50,17 @@ def feedback_app():
     data = load_test_plan_data(filename)
     section_details = data['section_details']
     application_name = data['application_name']
+    st.title(f"Feedback for Test Plan of Application: {application_name}")
+    st.info(f"Session id to Generate Feedback Form  : {session_id}!")
+    st.info(f"Doc id to Generate Feedback Form: {doc_id}!")
+    st.info(f"File Used to Generate Feedback Form : {filename}!")
+    st.info(f"Model Used: {model_used}!")
 
     with st.form("feedback_form"):
         feedback_data = []
         for detail in section_details:
+            with st.expander(f"View content for {detail['Section']}"):
+                st.write(detail['Content'])
             st.subheader(f"Feedback for {detail['Section']}")
             detail_rating = st.slider(f"Detail for {detail['Section']}", 1, 10,
                                       key=f"detail_{detail['Section']}_rating")
@@ -75,7 +94,7 @@ def feedback_app():
         })
 
         if st.form_submit_button("Submit All Feedback"):
-            save_feedback(feedback_data, application_name)
+            save_feedback(feedback_data, application_name, model_used)
 
 
 if __name__ == "__main__":

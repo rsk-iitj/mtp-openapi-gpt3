@@ -1,4 +1,6 @@
 import random
+import uuid
+
 import pandas as pd
 import streamlit as st
 import time
@@ -9,7 +11,6 @@ from pre_processing.keyword_extraction import extract_keywords
 from open_ai.openai_integration_updated import generate_section, list_engines, generate_test_plan_identifier, \
     extract_main_features_and_criticality, ai_based_testing_estimation, generate_excluded_features_section, \
     generate_features_to_be_tested_section, generate_staffing_and_training_needs
-from pre_processing.sentiment_analysis import assess_sentiment
 from open_ai.openai_integration_updated import generate_test_deliverables_section,generate_environmental_needs_section,generate_schedule_section,generate_responsibilities_section
 from open_ai.openai_integration_updated import generate_introduction_section,generate_glossary_section,generate_remaining_test_tasks
 
@@ -268,7 +269,7 @@ def generate_test_plan_section():
         "urls": urls
     }
     with st.spinner('Please wait...Processing!'):
-        st.markdown("## Test Plan")
+        st.markdown(F"## Test Plan for Application: {application_name} ")
         for index, section in enumerate(sections):
             local_progress_placeholder = st.empty()
             # Display generating status
@@ -416,15 +417,23 @@ def generate_test_plan():
 
 
 import json
+import os
 
 
 def save_test_plan_data(section_details, application_name):
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    filename_json = f'{sanitize_filename(application_name)}_{timestamp}_test_plan_data.json'
+    base_dir = "output/feedback"  # Base directory for feedback
+    app_dir = os.path.join(base_dir, sanitize_filename(application_name))  # App-specific directory
+    # Ensure the app-specific directory exists, if not, create it
+    os.makedirs(app_dir, exist_ok=True)
+    # Define the filename for the JSON file
+    filename_json = os.path.join(app_dir, f'{sanitize_filename(application_name)}_{timestamp}_test_plan_data.json')
+    # Data to be saved
     data = {
         'application_name': application_name,
         'section_details': section_details
     }
+    # Save data to JSON file
     with open(filename_json, 'w') as f:
         json.dump(data, f)
     return filename_json
@@ -436,14 +445,8 @@ if st.session_state.get('features_extracted', False) and not st.session_state.ge
         full_test_plan, section_details = generate_test_plan()
         end_time = time.time()
         elapsed_time = (end_time - start_time) / 60
-        st.markdown(f"""
-        <div style='text-align: left;'>
-            <h4 style='color: #00b8e6;'>
-                Total Time to Generate the Test Plan:
-                <strong>{elapsed_time:.2f} minutes</strong>
-            </h4>
-        </div>
-        """, unsafe_allow_html=True)
+        st.info(f"Total Time to Generate the Test Plan :{elapsed_time:.2f} minutes")
+
 
 
 def initialize_session_state():
@@ -468,9 +471,64 @@ def reset_app():
         initialize_session_state()
         st.experimental_rerun()
 import subprocess
-def launch_feedback_app(data_filename):
+
+
+def launch_feedback_app(data_filename, session_id, doc_gen_id, model_used):
     # Command to run the feedback application with the filename argument
-    subprocess.Popen(['streamlit', 'run', 'feedback_app.py', '--', data_filename])
+    subprocess.Popen(['streamlit', 'run', 'feedback_app_integrated.py', '--', data_filename, session_id, doc_gen_id, model_used])
+
+import sqlite3
+import uuid
+
+def create_connection(db_file):
+    """ create a database connection to a SQLite database """
+    conn = None
+    try:
+        conn = sqlite3.connect(db_file)
+        return conn
+    except Exception as e:
+        print(e)
+    return conn
+
+def create_table(conn):
+    """ create a table to store sessions, application names, and model details """
+    try:
+        c = conn.cursor()
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS sessions (
+                session_id TEXT PRIMARY KEY,
+                application_name TEXT,
+                model_used TEXT,
+                doc_gen_id TEXT,
+                filename TEXT
+            )
+        ''')
+        conn.commit()
+    except Exception as e:
+        print(e)
+
+def save_session_data(conn, application_name, model_used, filename):
+    """ save session data including application name, model used, and filename """
+    session_id = str(uuid.uuid4())
+    doc_gen_id = str(uuid.uuid4())  # Assuming you generate a unique ID for each document generation
+    c = conn.cursor()
+    c.execute('INSERT INTO sessions (session_id, application_name, model_used, doc_gen_id, filename) VALUES (?, ?, ?, ?, ?)',
+              (session_id, application_name, model_used, doc_gen_id, filename))
+    conn.commit()
+    return session_id, doc_gen_id
+
+def get_session_details(conn, session_id):
+    """ retrieve session details by session_id """
+    c = conn.cursor()
+    c.execute('SELECT application_name, model_used, doc_gen_id, filename FROM sessions WHERE session_id = ?', (session_id,))
+    result = c.fetchone()
+    return result if result else None
+
+# Main code to use the functions
+db_file = 'session_data.db'
+conn = create_connection(db_file)
+create_table(conn)
+
 
 if st.session_state.get('test_plan_generated', False):
     doc = save_test_plan(full_test_plan)
@@ -480,10 +538,10 @@ if st.session_state.get('test_plan_generated', False):
     st.markdown(link, unsafe_allow_html=True)
     full_test_plan, section_details = generate_test_plan()
     data_filename = save_test_plan_data(section_details, application_name)
-    launch_feedback_app(data_filename)
-    feedback_url = f"http://localhost:8502?data_file={data_filename}"
+    session_id, doc_gen_id = save_session_data(conn,application_name, selected_engine, data_filename)
+    feedback_url = f"http://localhost:8502?session_id={session_id}"
     st.markdown(f"[Launch Feedback App]({feedback_url})", unsafe_allow_html=True)
+    launch_feedback_app(data_filename, session_id, doc_gen_id,selected_engine)
     st.success('Feedback app is prepared. Click the link above to start providing feedback.')
     if st.button("Reset Application"):
         reset_app()
-
