@@ -12,6 +12,12 @@ from open_ai.openai_integration_updated import generate_section, list_engines, g
 from pre_processing.sentiment_analysis import assess_sentiment
 from open_ai.openai_integration_updated import generate_test_deliverables_section,generate_environmental_needs_section,generate_schedule_section,generate_responsibilities_section
 from open_ai.openai_integration_updated import generate_introduction_section,generate_glossary_section,generate_remaining_test_tasks
+
+
+def sanitize_filename(name):
+    return re.sub(r'[^\w\s-]', '', name).strip().replace(' ', '_')
+
+
 st.title('Automated Test Plan Generator')
 
 # Load OpenAI API key and list available engines
@@ -89,8 +95,7 @@ def generate_approvals_text():
 def generate_version_number():
     return datetime.now().strftime("%Y%m%d%H%M%S")
 
-def sanitize_filename(name):
-    return re.sub(r'[^\w\s-]', '', name).strip().replace(' ', '_')
+
 # Domain and technical stack selections
 
 custom_header("Application Section", level=3, size='22px')
@@ -107,11 +112,7 @@ domains = [
     "Procurement Management Solution", "Digital Agriculture"
 ]
 sections = [
-    "Test Plan Identifier", "References", "Approvals", "Introduction", "Test Items", "Software Risk Issues",
-    "Features to be Tested", "Features not to be Tested", "Approach", "Item Pass/Fail Criteria",
-    "Suspension Criteria and Resumption Requirements", "Test Deliverables", "Remaining Test Tasks", "Test Data Needs",
-    "Environmental Needs", "Staffing and Training Needs", "Responsibilities", "Schedule",
-    "Planning Risks and Contingencies", "Test Estimation", "Glossary"
+    "Test Plan Identifier", "References", "Approvals", "Introduction"
 ]
 
 selected_domain = st.selectbox("Select the application domain:", domains)
@@ -302,6 +303,9 @@ def generate_test_plan_section():
                     full_test_plan[section] = approvals_text
                 elif section == "Test Estimation":
                     estimation_texts = []
+                    estimation_texts.append(
+                        ai_based_testing_estimation(selected_engine, user_stories_text, features,
+                                                    num_testers, "Functional Testing", api_key))
                     if test_automation:
                         estimation_texts.append(
                             ai_based_testing_estimation(selected_engine, user_stories_text, features,
@@ -385,6 +389,8 @@ def generate_test_plan_section():
                 "Word Count": word_count
             })
             st.write(full_test_plan[section])
+    st.session_state['full_test_plan'] = full_test_plan
+    st.session_state['section_details'] = section_details
     return full_test_plan, section_details
 
 def display_all_sections_complete():
@@ -408,82 +414,22 @@ def generate_test_plan():
                 "Test Plan generation complete! ✔, Scroll down to end of Test Plan to Download Test Plan!")
     return st.session_state['full_test_plan'], st.session_state['section_details']
 
-def collect_feedback_and_save(section_details):
-    # Initialize feedback data storage in session state if not already present
-    if 'feedback_data' not in st.session_state:
-        st.session_state.feedback_data = []
 
-    with st.form("feedback_form"):
-        # Collect section-specific feedback
-        for detail in section_details:
-            st.subheader(f"Feedback for {detail['Section']}")
-            detail_rating = st.slider(f"Detail for {detail['Section']}", 1, 10,
-                                      key=f"detail_{detail['Section']}_rating")
-            clarity_rating = st.slider(f"Clarity for {detail['Section']}", 1, 10,
-                                       key=f"clarity_{detail['Section']}_rating")
-            relevance_rating = st.slider(f"Relevance for {detail['Section']}", 1, 10,
-                                         key=f"relevance_{detail['Section']}_rating")
+import json
 
-            # Store feedback in session state instead of local variable
-            st.session_state.feedback_data.append({
-                "Section": detail['Section'],
-                "Content": detail['Content'],
-                "Word Count": detail['Word Count'],
-                "Detail Rating": detail_rating,
-                "Clarity Rating": clarity_rating,
-                "Relevance Rating": relevance_rating
-            })
 
-        # Collect overall feedback
-        st.subheader("Overall Test Plan Feedback")
-        overall_quality = st.slider("Overall Quality", 1, 10, key="overall_quality")
-        overall_details = st.slider("Overall Detailing", 1, 10, key="overall_details")
-        overall_clarity = st.slider("Overall Clarity", 1, 10, key="overall_clarity")
-        overall_relevance = st.slider("Overall Relevance", 1, 10, key="overall_relevance")
+def save_test_plan_data(section_details, application_name):
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    filename_json = f'{sanitize_filename(application_name)}_{timestamp}_test_plan_data.json'
+    data = {
+        'application_name': application_name,
+        'section_details': section_details
+    }
+    with open(filename_json, 'w') as f:
+        json.dump(data, f)
+    return filename_json
 
-        submitted = st.form_submit_button("Submit All Feedback")
-        if submitted:
-            # Append overall feedback to the session state data
-            st.session_state.feedback_data.append({
-                "Section": "Overall Feedback",
-                "Content": "N/A",
-                "Word Count": "N/A",
-                "Detail Rating": overall_details,
-                "Clarity Rating": overall_clarity,
-                "Relevance Rating": overall_relevance,
-                "Overall Quality": overall_quality
-            })
 
-            # Convert feedback data to DataFrame and save to CSV
-            df = pd.DataFrame(st.session_state.feedback_data)
-            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-            filename = f"{application_name}_test_plan_feedback_{timestamp}.csv"
-            df.to_csv(filename, index=False)
-            st.success("Feedback submitted successfully and saved to 'test_plan_feedback.csv'.")
-            # Optionally, you can clear the feedback data from the session after saving
-            st.session_state['feedback_collected'] = True  # Mark feedback as collected
-            if st.session_state['feedback_collected']:
-                st.session_state.clear()
-                # Optionally re-initialize any necessary defaults
-                st.session_state['init'] = True
-                st.session_state['texts_extracted'] = False
-                st.session_state['features_extracted'] = False
-                st.session_state['test_plan_generated'] = False
-                st.session_state['file_names'] = []
-                st.session_state['user_stories_text'] = ''
-                st.session_state['features'] = []
-                st.session_state['criticalities'] = []
-                st.session_state['keywords'] = []
-                st.session_state['approvers'] = []
-                st.session_state['reviewers'] = []
-                st.session_state['document_directory'] = ""
-                st.session_state.feedback_data = []
-                st.session_state['full_test_plan'] = []
-                st.session_state['section_details'] = []
-                # Rerun the app from the top after resetting the state
-                st.experimental_rerun()
-
-    # Trigger the test plan generation
 if st.session_state.get('features_extracted', False) and not st.session_state.get('test_plan_generated', False):
     if st.button("Generate Test Plan"):
         start_time = time.time()
@@ -499,13 +445,45 @@ if st.session_state.get('features_extracted', False) and not st.session_state.ge
         </div>
         """, unsafe_allow_html=True)
 
-    # Display additional information and actions after the test plan is generated
+
+def initialize_session_state():
+    st.session_state['init'] = True
+    st.session_state['texts_extracted'] = False
+    st.session_state['features_extracted'] = False
+    st.session_state['test_plan_generated'] = False
+    st.session_state['file_names'] = []
+    st.session_state['user_stories_text'] = ''
+    st.session_state['features'] = []
+    st.session_state['criticalities'] = []
+    st.session_state['keywords'] = []
+    st.session_state['approvers'] = []
+    st.session_state['reviewers'] = []
+    st.session_state['document_directory'] = ""
+    st.session_state.feedback_data = []
+    st.session_state['full_test_plan'] = {}
+    st.session_state['section_details'] = []
+
+def reset_app():
+        st.session_state.clear()
+        initialize_session_state()
+        st.experimental_rerun()
+import subprocess
+def launch_feedback_app(data_filename):
+    # Command to run the feedback application with the filename argument
+    subprocess.Popen(['streamlit', 'run', 'feedback_app.py', '--', data_filename])
+
 if st.session_state.get('test_plan_generated', False):
     doc = save_test_plan(full_test_plan)
     version_number = generate_version_number()
     filename = f"{sanitize_filename(application_name)}_v{version_number}_Test_Plan.docx"
     link = download_link(doc, filename, "Download Test Plan as Word Document")
     st.markdown(link, unsafe_allow_html=True)
+    full_test_plan, section_details = generate_test_plan()
+    data_filename = save_test_plan_data(section_details, application_name)
+    launch_feedback_app(data_filename)
+    feedback_url = f"http://localhost:8502?data_file={data_filename}"
+    st.markdown(f"[Launch Feedback App]({feedback_url})", unsafe_allow_html=True)
+    st.success('Feedback app is prepared. Click the link above to start providing feedback.')
+    if st.button("Reset Application"):
+        reset_app()
 
-    if st.session_state.get('test_plan_generated', False) and not st.session_state.get('feedback_collected', False):
-        collect_feedback_and_save(section_details)
