@@ -102,6 +102,7 @@ def generate_version_number():
 custom_header("Application Section", level=3, size='22px')
 
 application_name = st.text_input("Enter the Application Name:")
+
 domains = [
     "Telecom Industry", "E-Commerce", "IT Industry", "Marketing, Advertising, Sales", "Government sector",
     "Media & Entertainment", "Travel & Tourism", "IoT & Geofencing", "Finances",
@@ -110,24 +111,85 @@ domains = [
     "Education Industry", "Mobile App Development", "Distribution Management System",
     "Science & Innovation", "Construction & Engineering", "Manufacturing",
     "Ecology and Environmental Protection", "Project Management Industry", "Logistics",
-    "Procurement Management Solution", "Digital Agriculture"
-]
-sections = [
-    "Test Plan Identifier", "References", "Approvals", "Introduction"
+    "Procurement Management Solution", "Digital Agriculture", "Privacy & Security", "Utility"
 ]
 
-selected_domain = st.selectbox("Select the application domain:", domains)
+# Provide a unique key for the selectbox to avoid DuplicateWidgetID error
+selected_domain = st.selectbox("Select the application domain:", domains, key='domain_select')
+
+platforms = [
+    "Windows", "Linux", "macOS", "BSD", "Android", "iOS", "Other"
+]
+
+# Again, ensure to provide a unique key
+selected_platforms = st.multiselect("Select Supported Platforms:", platforms, key='platform_select')
+
+if 'Other' in selected_platforms:
+    other_platform = st.text_input("Specify Other Platform", key='other_platform')
+    if other_platform:
+        selected_platforms.append(other_platform)  # Optionally append the specified platform to the list
+
+# Optionally display the selected platforms for confirmation
+st.write("Selected Platforms:", ', '.join(selected_platforms))
+
+# Optionally display the selected platforms for confirmation
+
+sections = [
+    "Test Plan Identifier", "References", "Approvals", "Introduction", "Test Items", "Software Risk Issues" "Features to be Tested", "Features not to be Tested", "Approach", "Item Pass/Fail Criteria",
+    "Suspension Criteria and Resumption Requirements", "Test Deliverables", "Remaining Test Tasks", "Test Data Needs",
+    "Environmental Needs", "Staffing and Training Needs", "Responsibilities", "Schedule",
+    "Planning Risks and Contingencies", "Test Estimation", "Glossary"
+]
 
 custom_header("Technology Stack", level=3, size='18px')
 
-tech_stack = {
-    "Frontend Technology": st.selectbox("Select Frontend Technology", ["React", "Angular", "Vue", "Other"]),
-    "Backend Technology": st.selectbox("Select Backend Technology", ["Node.js", "Python", "Java", "Other"]),
-    "Database": st.selectbox("Select Database", ["MySQL", "MongoDB", "PostgreSQL", "Other"]),
-    "Messaging Queue": st.selectbox("Select Messaging Queue", ["RabbitMQ", "Kafka", "AWS SQS", "Other"]),
-    "Cloud Infrastructure": st.selectbox("Select Cloud Infrastructure", ["AWS", "Azure", "Google Cloud", "Other"]),
-    "Additional Technologies": st.text_input("Specify any additional technologies not listed above:")
-}
+tech_stack = {}
+
+tech_stack["Frontend Technology"] = st.selectbox(
+    "Select Frontend Technology",
+    ["React", "Angular", "Vue", "Other", "Not Applicable"]
+)
+if tech_stack["Frontend Technology"] == "Other":
+    tech_stack["Frontend Technology"] = st.text_input("Specify Frontend Technology")
+
+tech_stack["Backend Technology"] = st.selectbox(
+    "Select Backend Technology",
+    ["Node.js", "Python", "Java", ".NET", "Other", "Not Applicable"]
+)
+if tech_stack["Backend Technology"] == "Other":
+    tech_stack["Backend Technology"] = st.text_input("Specify Backend Technology")
+
+tech_stack["Database"] = st.selectbox(
+    "Select Database",
+    ["MySQL", "MongoDB", "PostgreSQL", "Other", "Not Applicable"]
+)
+if tech_stack["Database"] == "Other":
+    tech_stack["Database"] = st.text_input("Specify Database")
+
+tech_stack["Messaging Queue"] = st.selectbox(
+    "Select Messaging Queue",
+    ["RabbitMQ", "Kafka", "AWS SQS", "Other", "Not Applicable"]
+)
+if tech_stack["Messaging Queue"] == "Other":
+    tech_stack["Messaging Queue"] = st.text_input("Specify Messaging Queue")
+
+tech_stack["Cloud Infrastructure"] = st.selectbox(
+    "Select Cloud Infrastructure",
+    ["AWS", "Azure", "Google Cloud", "Other", "Not Applicable"]
+)
+if tech_stack["Cloud Infrastructure"] == "Other":
+    tech_stack["Cloud Infrastructure"] = st.text_input("Specify Cloud Infrastructure")
+
+tech_stack["Framework"] = st.selectbox(
+    "Select Framework",
+    [".NET", "Spring", "Django", "Flask", "Other", "Not Applicable"]
+)
+if tech_stack["Framework"] == "Other":
+    tech_stack["Framework"] = st.text_input("Specify Framework")
+
+tech_stack["Additional Technologies"] = st.text_input(
+    "Specify any additional technologies not listed above:"
+)
 
 # Automation and resources
 
@@ -172,17 +234,18 @@ if 'init' not in st.session_state:
     })
 
 def extract_user_stories():
-    if document_directory:
-        extracted_texts, file_names = extract_texts_from_folder(document_directory)
-        if extracted_texts:
-            st.session_state.user_stories_text = "\n\n".join(extracted_texts)
-            st.session_state.file_names = file_names
-            st.session_state.texts_extracted = True
-            st.success("Requirements Text successfully extracted from requirements & design documents Provided.")
+    with st.spinner('Extracting Functional & Non Functional Requirement Texts....'):
+        if document_directory:
+            extracted_texts, file_names = extract_texts_from_folder(document_directory)
+            if extracted_texts:
+                st.session_state.user_stories_text = "\n\n".join(extracted_texts)
+                st.session_state.file_names = file_names
+                st.session_state.texts_extracted = True
+                st.success("Requirements Text successfully extracted from requirements & design documents Provided.")
+            else:
+                st.error("No text could be extracted. Check the document formats and directory path.")
         else:
-            st.error("No text could be extracted. Check the document formats and directory path.")
-    else:
-        st.warning("Please enter a valid directory path.")
+            st.warning("Please enter a valid directory path.")
 
 def display_extracted_info():
     if 'features_extracted' in st.session_state and st.session_state.features_extracted:
