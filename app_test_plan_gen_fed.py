@@ -135,7 +135,7 @@ st.write("Selected Platforms:", ', '.join(selected_platforms))
 # Optionally display the selected platforms for confirmation
 
 sections = [
-    "Test Plan Identifier", "References", "Approvals", "Introduction", "Test Items", "Software Risk Issues" "Features to be Tested", "Features not to be Tested", "Approach", "Item Pass/Fail Criteria",
+    "Test Plan Identifier", "References", "Approvals", "Introduction", "Test Items", "Software Risk Issues" "Features to be Tested", "Features not to be Tested", "Functional & Non-functional Testing Approach", "Item Pass/Fail Criteria",
     "Suspension Criteria and Resumption Requirements", "Test Deliverables", "Remaining Test Tasks", "Test Data Needs",
     "Environmental Needs", "Staffing and Training Needs", "Responsibilities", "Schedule",
     "Planning Risks and Contingencies", "Test Estimation", "Glossary"
