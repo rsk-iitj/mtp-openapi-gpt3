@@ -55,7 +55,7 @@ def extract_texts_from_folder(directory):
 
 
 
-def save_test_plan(full_test_plan, application_name):
+def save_test_plan(full_test_plan, application_name, model_used):
     # Define the directory structure
     base_directory = "output/test-plan"
     application_directory = os.path.join(base_directory, application_name.replace(" ", "_"))
@@ -93,7 +93,7 @@ def save_test_plan(full_test_plan, application_name):
                         p.add_run(part)
 
     # Save the document
-    filename = os.path.join(application_directory, f"{application_name.replace(' ', '_')}_Test_Plan.docx")
+    filename = os.path.join(application_directory, f"{application_name.replace(' ', '_')}_Test_Plan_{model_used}.docx")
     doc.save(filename)
     print(f"Document saved to {filename}")
     return doc
