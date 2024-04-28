@@ -594,7 +594,7 @@ create_table(conn)
 
 
 if st.session_state.get('test_plan_generated', False):
-    doc = save_test_plan(full_test_plan)
+    doc = save_test_plan(full_test_plan, application_name)
     version_number = generate_version_number()
     filename = f"{sanitize_filename(application_name)}_v{version_number}_Test_Plan.docx"
     link = download_link(doc, filename, "Download Test Plan as Word Document")
