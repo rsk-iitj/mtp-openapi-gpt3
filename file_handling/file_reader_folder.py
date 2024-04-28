@@ -3,9 +3,10 @@ import base64
 from docx import Document
 import re
 from io import BytesIO
-import textract
 import pandas as pd
 import pdfplumber
+
+
 
 def extract_text_from_file(file_path):
     ext = os.path.splitext(file_path)[1].lower()
@@ -53,7 +54,16 @@ def extract_texts_from_folder(directory):
 
 
 
-def save_test_plan(full_test_plan):
+
+def save_test_plan(full_test_plan, application_name):
+    # Define the directory structure
+    base_directory = "output/test-plan"
+    application_directory = os.path.join(base_directory, application_name.replace(" ", "_"))
+
+    # Create the directory if it does not exist
+    os.makedirs(application_directory, exist_ok=True)
+
+    # Initialize the Word document
     doc = Document()
     for section, content in full_test_plan.items():
         # Add main section heading from the dictionary key
@@ -81,7 +91,13 @@ def save_test_plan(full_test_plan):
                         p.add_run(part).bold = True
                     else:
                         p.add_run(part)
+
+    # Save the document
+    filename = os.path.join(application_directory, f"{application_name.replace(' ', '_')}_Test_Plan.docx")
+    doc.save(filename)
+    print(f"Document saved to {filename}")
     return doc
+
 
 def download_link(doc, filename, text):
     # Generate download link for the document
