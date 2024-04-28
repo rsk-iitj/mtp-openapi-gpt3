@@ -334,6 +334,7 @@ def generate_test_plan_section():
     with st.spinner('Please wait...Processing!'):
         st.markdown(F"## Test Plan for Application: {application_name} ")
         for index, section in enumerate(sections):
+            start_time_sec = time.time()
             local_progress_placeholder = st.empty()
             # Display generating status
             section_status_placeholder = st.empty()
@@ -447,10 +448,13 @@ def generate_test_plan_section():
             section_status_placeholder.success(f"Completed Section: **{section}** ✔️")
             # Clear local progress
             word_count = len(full_test_plan[section].split())
+            end_time_sec = time.time()
+            section_time = end_time_sec - start_time_sec
             section_details.append({
                 "Section": section,
                 "Content": full_test_plan[section],
-                "Word Count": word_count
+                "Word Count": word_count,
+                "Generation Time":section_time
             })
             st.write(full_test_plan[section])
     st.session_state['full_test_plan'] = full_test_plan

@@ -72,6 +72,7 @@ def feedback_app():
                 "Section": detail['Section'],
                 "Content": detail['Content'],
                 "Word Count": detail['Word Count'],
+                "Generation Time": detail['Generation Time'],
                 "Detail Rating": detail_rating,
                 "Clarity Rating": clarity_rating,
                 "Relevance Rating": relevance_rating
