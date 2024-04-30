@@ -1,13 +1,10 @@
 import random
-import uuid
-
-import pandas as pd
 import streamlit as st
 import time
 import re
 from datetime import datetime
 from file_handling.file_reader_folder import extract_texts_from_folder,save_test_plan,download_link
-from pre_processing.keyword_extraction import extract_keywords
+from nlp_pre_processing.keyword_extraction import extract_keywords
 from open_ai.openai_integration_updated import generate_section, list_engines, generate_test_plan_identifier, \
     extract_main_features_and_criticality, ai_based_testing_estimation, generate_excluded_features_section, \
     generate_features_to_be_tested_section, generate_staffing_and_training_needs

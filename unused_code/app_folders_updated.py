@@ -3,11 +3,11 @@ import time
 import re
 from datetime import datetime
 from file_handling.file_reader_folder import extract_texts_from_folder,save_test_plan,download_link
-from pre_processing.keyword_extraction import extract_keywords
+from nlp_pre_processing.keyword_extraction import extract_keywords
 from open_ai.openai_integration_updated import generate_section, list_engines, generate_test_plan_identifier, \
     extract_main_features_and_criticality, ai_based_testing_estimation, generate_excluded_features_section, \
     generate_features_to_be_tested_section, generate_staffing_and_training_needs
-from pre_processing.sentiment_analysis import assess_sentiment
+from nlp_pre_processing.criticality_analysis import assess_sentiment
 from open_ai.openai_integration_updated import generate_test_deliverables_section,generate_environmental_needs_section,generate_schedule_section,generate_responsibilities_section
 from open_ai.openai_integration_updated import generate_introduction_section,generate_glossary_section,generate_remaining_test_tasks
 st.title('Automated Test Plan Generator')

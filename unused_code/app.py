@@ -1,8 +1,8 @@
 import streamlit as st
 from file_handling.file_reader import extract_text_from_file
-from pre_processing.keyword_extraction import extract_keywords
+from nlp_pre_processing.keyword_extraction import extract_keywords
 from open_ai.openai_integration import generate_section, list_engines
-from pre_processing.sentiment_analysis import assess_sentiment
+from nlp_pre_processing.criticality_analysis import assess_sentiment
 
 st.title('Automated Test Plan Generator')
 
