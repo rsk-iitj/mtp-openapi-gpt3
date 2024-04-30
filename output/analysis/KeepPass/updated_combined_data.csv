@@ -1,0 +1,190 @@
+Section,Word Count,Detail Rating,Clarity Rating,Relevance Rating,Overall Quality,Model Name,Generation Time
+Test Plan Identifier,40,10,10,10,,gpt-3.5-turbo-1106,8.178564872
+References,15,10,10,10,,gpt-3.5-turbo-1106,6.445482703
+Approvals,22,10,10,10,,gpt-3.5-turbo-1106,4.249244108
+Introduction,187,8,8,8,,gpt-3.5-turbo-1106,43.49935097
+Test Items,312,9,9,9,,gpt-3.5-turbo-1106,42.51397946
+Software Risk IssuesFeatures to be Tested,379,8,8,8,,gpt-3.5-turbo-1106,48.00944828
+Features not to be Tested,201,7,7,6,,gpt-3.5-turbo-1106,20.3505096
+Approach,252,4,4,4,,gpt-3.5-turbo-1106,
+Item Pass/Fail Criteria,341,8,8,8,,gpt-3.5-turbo-1106,60.53720663
+Suspension Criteria and Resumption Requirements,198,3,6,4,,gpt-3.5-turbo-1106,92.55542568
+Test Deliverables,411,7,7,6,,gpt-3.5-turbo-1106,29.8764717
+Remaining Test Tasks,310,7,7,7,,gpt-3.5-turbo-1106,19.79468078
+Test Data Needs,273,4,3,3,,gpt-3.5-turbo-1106,34.3739278
+Environmental Needs,383,6,6,4,,gpt-3.5-turbo-1106,38.34373278
+Staffing and Training Needs,345,6,6,5,,gpt-3.5-turbo-1106,18.6776819
+Responsibilities,1488,8,8,7,,gpt-3.5-turbo-1106,56.50579242
+Schedule,756,1,1,1,,gpt-3.5-turbo-1106,52.42562579
+Planning Risks and Contingencies,325,4,4,3,,gpt-3.5-turbo-1106,35.55142972
+Test Estimation,1114,9,9,9,,gpt-3.5-turbo-1106,90.20024857
+Glossary,254,9,9,9,,gpt-3.5-turbo-1106,11.60346357
+Overall Feedback,,7,6,6,7,gpt-3.5-turbo-1106,
+Test Plan Identifier,4,6,4,7,,gpt-3.5-turbo-16k-0613,8.137182288
+References,15,10,10,10,,gpt-3.5-turbo-16k-0613,6.023571931
+Approvals,22,10,10,10,,gpt-3.5-turbo-16k-0613,5.53107019
+Introduction,251,9,9,9,,gpt-3.5-turbo-16k-0613,16.70739493
+Test Items,437,9,9,9,,gpt-3.5-turbo-16k-0613,28.87452937
+Software Risk IssuesFeatures to be Tested,463,8,7,9,,gpt-3.5-turbo-16k-0613,29.64484891
+Features not to be Tested,193,8,9,8,,gpt-3.5-turbo-16k-0613,17.79921596
+Approach,263,7,6,6,,gpt-3.5-turbo-16k-0613,
+Item Pass/Fail Criteria,208,8,8,7,,gpt-3.5-turbo-16k-0613,42.92436081
+Suspension Criteria and Resumption Requirements,261,6,7,8,,gpt-3.5-turbo-16k-0613,1.495892887
+Test Deliverables,384,7,7,7,,gpt-3.5-turbo-16k-0613,27.06815792
+Remaining Test Tasks,335,8,8,7,,gpt-3.5-turbo-16k-0613,11.69713614
+Test Data Needs,203,6,7,7,,gpt-3.5-turbo-16k-0613,30.18714081
+Environmental Needs,448,8,8,7,,gpt-3.5-turbo-16k-0613,35.65418153
+Staffing and Training Needs,358,7,7,7,,gpt-3.5-turbo-16k-0613,22.88925905
+Responsibilities,2124,9,8,8,,gpt-3.5-turbo-16k-0613,65.70673423
+Schedule,932,9,8,8,,gpt-3.5-turbo-16k-0613,18.93425851
+Planning Risks and Contingencies,340,8,7,8,,gpt-3.5-turbo-16k-0613,30.90747037
+Test Estimation,707,7,7,8,,gpt-3.5-turbo-16k-0613,103.8468897
+Glossary,397,9,9,9,,gpt-3.5-turbo-16k-0613,28.73429094
+Overall Feedback,,7,7,7,8,gpt-3.5-turbo-16k-0613,
+Test Plan Identifier,39,10,10,10,,gpt-3.5-turbo-16k,9.419549061
+References,15,10,10,10,,gpt-3.5-turbo-16k,3.790011765
+Approvals,18,10,10,10,,gpt-3.5-turbo-16k,6.124930472
+Introduction,202,8,8,8,,gpt-3.5-turbo-16k,13.29041228
+Test Items,450,8,8,8,,gpt-3.5-turbo-16k,18.49943074
+Software Risk IssuesFeatures to be Tested,682,8,8,8,,gpt-3.5-turbo-16k,28.50822385
+Features not to be Tested,278,8,8,8,,gpt-3.5-turbo-16k,17.45204409
+Functional & Non-functional Testing Approach,515,6,7,8,,gpt-3.5-turbo-16k,43.177949
+Item Pass/Fail Criteria,210,8,7,8,,gpt-3.5-turbo-16k,17.06059868
+Suspension Criteria and Resumption Requirements,215,5,5,5,,gpt-3.5-turbo-16k,43.46853741
+Test Deliverables,383,8,8,8,,gpt-3.5-turbo-16k,25.89148
+Remaining Test Tasks,332,6,7,7,,gpt-3.5-turbo-16k,26.1493853
+Test Data Needs,305,8,8,8,,gpt-3.5-turbo-16k,32.79599447
+Environmental Needs,580,8,8,8,,gpt-3.5-turbo-16k,27.41840462
+Staffing and Training Needs,430,5,5,4,,gpt-3.5-turbo-16k,19.43404938
+Responsibilities,1677,8,8,8,,gpt-3.5-turbo-16k,72.53043208
+Schedule,1158,8,8,8,,gpt-3.5-turbo-16k,79.90136929
+Planning Risks and Contingencies,427,5,5,5,,gpt-3.5-turbo-16k,22.547535
+Test Estimation,1130,6,7,6,,gpt-3.5-turbo-16k,5.406908414
+Glossary,391,10,10,10,,gpt-3.5-turbo-16k,15.83881195
+Overall Feedback,,6,6,6,6,gpt-3.5-turbo-16k,
+Test Plan Identifier,97,10,10,10,,gpt-4-1106-preview,8.462549811
+References,15,10,10,10,,gpt-4-1106-preview,4.769017247
+Approvals,2,10,10,10,,gpt-4-1106-preview,4.787037682
+Introduction,422,10,10,10,,gpt-4-1106-preview,25.15084041
+Test Items,466,10,10,10,,gpt-4-1106-preview,54.84053879
+Software Risk IssuesFeatures to be Tested,547,10,10,9,,gpt-4-1106-preview,18.6328468
+Features not to be Tested,527,10,10,10,,gpt-4-1106-preview,26.02819688
+Functional & Non-functional Testing Approach,590,10,10,9,,gpt-4-1106-preview,23.24481067
+Item Pass/Fail Criteria,512,10,10,10,,gpt-4-1106-preview,46.84133149
+Suspension Criteria and Resumption Requirements,366,9,9,9,,gpt-4-1106-preview,32.01044388
+Test Deliverables,583,8,8,7,,gpt-4-1106-preview,13.1346323
+Remaining Test Tasks,358,10,9,9,,gpt-4-1106-preview,32.12836843
+Test Data Needs,549,10,10,10,,gpt-4-1106-preview,25.14181719
+Environmental Needs,581,10,9,9,,gpt-4-1106-preview,23.45736245
+Staffing and Training Needs,371,7,7,6,,gpt-4-1106-preview,28.5727179
+Responsibilities,1928,10,9,9,,gpt-4-1106-preview,72.89235079
+Schedule,1389,10,9,9,,gpt-4-1106-preview,50.81404657
+Planning Risks and Contingencies,518,10,10,10,,gpt-4-1106-preview,45.86687849
+Test Estimation,1483,10,10,10,,gpt-4-1106-preview,61.77334807
+Glossary,408,10,10,10,,gpt-4-1106-preview,22.31701861
+Overall Feedback,,10,9,9,9,gpt-4-1106-preview,
+Test Plan Identifier,39,10,10,10,,gpt-3.5-turbo,7.581053142
+References,15,10,10,10,,gpt-3.5-turbo,4.859231373
+Approvals,22,10,10,10,,gpt-3.5-turbo,5.678432207
+Introduction,128,6,6,7,,gpt-3.5-turbo,22.14760999
+Test Items,293,9,9,9,,gpt-3.5-turbo,25.11461756
+Software Risk IssuesFeatures to be Tested,358,9,9,9,,gpt-3.5-turbo,55.53349128
+Features not to be Tested,108,7,9,9,,gpt-3.5-turbo,21.3344296
+Functional & Non-functional Testing Approach,353,8,7,7,,gpt-3.5-turbo,41.50511519
+Item Pass/Fail Criteria,283,9,8,8,,gpt-3.5-turbo,40.78075463
+Suspension Criteria and Resumption Requirements,261,8,8,8,,gpt-3.5-turbo,12.54855199
+Test Deliverables,332,8,8,8,,gpt-3.5-turbo,24.52985081
+Remaining Test Tasks,274,8,8,8,,gpt-3.5-turbo,25.04491838
+Test Data Needs,359,9,8,7,,gpt-3.5-turbo,37.30284886
+Environmental Needs,424,9,8,8,,gpt-3.5-turbo,25.3295663
+Staffing and Training Needs,350,7,7,7,,gpt-3.5-turbo,23.35592037
+Responsibilities,1635,8,8,7,,gpt-3.5-turbo,80.96886296
+Schedule,895,8,8,8,,gpt-3.5-turbo,52.56154193
+Planning Risks and Contingencies,179,8,8,8,,gpt-3.5-turbo,27.91317293
+Test Estimation,835,8,7,7,,gpt-3.5-turbo,78.97356981
+Glossary,322,10,10,10,,gpt-3.5-turbo,12.41153698
+Overall Feedback,,8,7,7,8,gpt-3.5-turbo,
+Test Plan Identifier,51,10,10,10,,gpt-3.5-turbo-0125,9.048102856
+References,15,10,10,10,,gpt-3.5-turbo-0125,5.758926868
+Approvals,16,10,10,10,,gpt-3.5-turbo-0125,4.245861292
+Introduction,137,5,5,5,,gpt-3.5-turbo-0125,7.463650227
+Test Items,258,6,6,5,,gpt-3.5-turbo-0125,19.89061213
+Software Risk IssuesFeatures to be Tested,198,5,5,5,,gpt-3.5-turbo-0125,15.49172688
+Features not to be Tested,325,5,5,4,,gpt-3.5-turbo-0125,11.16889739
+Functional & Non-functional Testing Approach,288,6,5,4,,gpt-3.5-turbo-0125,19.95687842
+Item Pass/Fail Criteria,339,6,5,5,,gpt-3.5-turbo-0125,19.13399029
+Suspension Criteria and Resumption Requirements,162,7,5,5,,gpt-3.5-turbo-0125,16.89496326
+Test Deliverables,312,6,7,5,,gpt-3.5-turbo-0125,10.11714315
+Remaining Test Tasks,286,6,5,5,,gpt-3.5-turbo-0125,10.9598105
+Test Data Needs,229,4,4,4,,gpt-3.5-turbo-0125,17.04186845
+Environmental Needs,416,5,5,5,,gpt-3.5-turbo-0125,14.3803153
+Staffing and Training Needs,344,4,4,5,,gpt-3.5-turbo-0125,14.11195731
+Responsibilities,1646,4,4,4,,gpt-3.5-turbo-0125,34.84112501
+Schedule,859,6,5,5,,gpt-3.5-turbo-0125,23.50842452
+Planning Risks and Contingencies,230,7,6,6,,gpt-3.5-turbo-0125,17.84584355
+Test Estimation,1214,7,7,7,,gpt-3.5-turbo-0125,31.47300363
+Glossary,271,9,9,9,,gpt-3.5-turbo-0125,12.82585478
+Overall Feedback,,4,4,3,5,gpt-3.5-turbo-0125,
+Test Plan Identifier,19,9,8,9,,gpt-4-turbo-preview,7.665791512
+References,15,10,10,10,,gpt-4-turbo-preview,4.836285114
+Approvals,2,10,10,10,,gpt-4-turbo-preview,5.33621335
+Introduction,411,9,9,9,,gpt-4-turbo-preview,17.28219604
+Test Items,475,9,9,9,,gpt-4-turbo-preview,36.76652241
+Software Risk IssuesFeatures to be Tested,548,8,8,8,,gpt-4-turbo-preview,40.68665481
+Features not to be Tested,484,9,9,8,,gpt-4-turbo-preview,24.98813128
+Functional & Non-functional Testing Approach,483,8,8,7,,gpt-4-turbo-preview,37.12064409
+Item Pass/Fail Criteria,269,7,7,7,,gpt-4-turbo-preview,25.88475585
+Suspension Criteria and Resumption Requirements,432,9,9,8,,gpt-4-turbo-preview,31.02162242
+Test Deliverables,712,9,9,9,,gpt-4-turbo-preview,30.83705807
+Remaining Test Tasks,366,8,8,8,,gpt-4-turbo-preview,19.14006209
+Test Data Needs,456,8,8,8,,gpt-4-turbo-preview,33.12695432
+Environmental Needs,531,9,8,7,,gpt-4-turbo-preview,24.35988402
+Staffing and Training Needs,374,7,7,7,,gpt-4-turbo-preview,19.24127936
+Responsibilities,2290,9,9,9,,gpt-4-turbo-preview,91.55743432
+Schedule,1373,9,9,9,,gpt-4-turbo-preview,67.84447598
+Planning Risks and Contingencies,486,9,9,9,,gpt-4-turbo-preview,33.59480262
+Test Estimation,1380,9,9,9,,gpt-4-turbo-preview,67.87170053
+Glossary,398,8,8,8,,gpt-4-turbo-preview,21.05670118
+Overall Feedback,,8,8,8,8,gpt-4-turbo-preview,
+Test Plan Identifier,23,10,10,10,,gpt-4-turbo-2024-04-09,7.926982641
+References,15,10,10,10,,gpt-4-turbo-2024-04-09,6.773418665
+Approvals,19,10,10,10,,gpt-4-turbo-2024-04-09,5.779950142
+Introduction,378,10,10,10,,gpt-4-turbo-2024-04-09,28.43240738
+Test Items,413,8,8,8,,gpt-4-turbo-2024-04-09,37.83795333
+Software Risk IssuesFeatures to be Tested,559,8,8,8,,gpt-4-turbo-2024-04-09,44.00624943
+Features not to be Tested,527,9,9,9,,gpt-4-turbo-2024-04-09,33.00139832
+Functional & Non-functional Testing Approach,558,8,8,9,,gpt-4-turbo-2024-04-09,44.28136873
+Item Pass/Fail Criteria,509,8,8,8,,gpt-4-turbo-2024-04-09,45.45331645
+Suspension Criteria and Resumption Requirements,440,8,7,7,,gpt-4-turbo-2024-04-09,67.67387199
+Test Deliverables,564,8,8,8,,gpt-4-turbo-2024-04-09,29.79106188
+Remaining Test Tasks,395,8,8,8,,gpt-4-turbo-2024-04-09,25.77007174
+Test Data Needs,495,7,7,7,,gpt-4-turbo-2024-04-09,37.95397305
+Environmental Needs,510,7,7,7,,gpt-4-turbo-2024-04-09,32.91125035
+Staffing and Training Needs,384,8,8,8,,gpt-4-turbo-2024-04-09,27.56330609
+Responsibilities,2329,10,9,9,,gpt-4-turbo-2024-04-09,106.6263921
+Schedule,1335,9,9,9,,gpt-4-turbo-2024-04-09,74.54629755
+Planning Risks and Contingencies,480,8,8,7,,gpt-4-turbo-2024-04-09,41.11733007
+Test Estimation,1404,8,8,8,,gpt-4-turbo-2024-04-09,82.45678711
+Glossary,377,9,9,9,,gpt-4-turbo-2024-04-09,27.1544857
+Overall Feedback,,8,8,8,8,gpt-4-turbo-2024-04-09,
+Test Plan Identifier,22,10,10,10,,gpt-4-turbo,8.717575788
+References,15,10,10,10,,gpt-4-turbo,4.671705484
+Approvals,19,10,10,10,,gpt-4-turbo,6.777017355
+Introduction,354,9,9,9,,gpt-4-turbo,19.97321653
+Test Items,420,8,8,8,,gpt-4-turbo,36.59019732
+Software Risk IssuesFeatures to be Tested,517,8,8,8,,gpt-4-turbo,42.23908281
+Features not to be Tested,478,8,8,8,,gpt-4-turbo,23.35186648
+Functional & Non-functional Testing Approach,474,8,7,8,,gpt-4-turbo,49.6188302
+Item Pass/Fail Criteria,608,8,8,8,,gpt-4-turbo,44.18846393
+Suspension Criteria and Resumption Requirements,435,8,8,8,,gpt-4-turbo,36.10054851
+Test Deliverables,564,7,7,7,,gpt-4-turbo,31.51173878
+Remaining Test Tasks,400,7,7,7,,gpt-4-turbo,28.33097959
+Test Data Needs,434,7,7,7,,gpt-4-turbo,38.40586233
+Environmental Needs,612,7,7,7,,gpt-4-turbo,30.63585663
+Staffing and Training Needs,342,6,6,6,,gpt-4-turbo,24.59283948
+Responsibilities,2325,7,7,7,,gpt-4-turbo,99.84398675
+Schedule,1393,1,1,1,,gpt-4-turbo,68.62610269
+Planning Risks and Contingencies,505,8,8,8,,gpt-4-turbo,45.02876854
+Test Estimation,1423,8,8,8,,gpt-4-turbo,68.97079229
+Glossary,378,9,9,9,,gpt-4-turbo,28.96634173
+Overall Feedback,,8,8,8,8,gpt-4-turbo,
