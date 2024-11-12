@@ -113,6 +113,7 @@ async def extract_texts_from_folder(directory):
     """Extracts text from all supported files in a directory asynchronously and concurrently."""
     supported_formats = ['.txt', '.md', '.pdf', '.xls', '.xlsx', '.doc', '.docx']
     tasks = []
+    file_names = []
 
     # Loop through all files in the given directory
     for root, _, files in os.walk(directory):
@@ -120,9 +121,12 @@ async def extract_texts_from_folder(directory):
             if any(file.lower().endswith(ext) for ext in supported_formats):
                 file_path = os.path.join(root, file)
                 tasks.append(extract_text_from_file(file_path))
+                file_names.append(file)
 
     # Run all tasks concurrently
-    return await asyncio.gather(*tasks)
+    extracted_texts = await asyncio.gather(*tasks)
+
+    return extracted_texts, file_names
 
 # OCR Function using Tesseract
 def analyze_image_with_ocr(image_bytes):
@@ -150,3 +154,55 @@ async def analyze_image_with_openai(image_bytes):
     except openai.error.OpenAIError as e:
         print(f"Error analyzing image with OpenAI: {e}")
         return "Image description could not be generated."
+def save_test_plan(full_test_plan, application_name, model_used):
+    # Define the directory structure
+    base_directory = "output/test-plan"
+    application_directory = os.path.join(base_directory, application_name.replace(" ", "_"))
+
+    # Create the directory if it does not exist
+    os.makedirs(application_directory, exist_ok=True)
+
+    # Initialize the Word document
+    doc = Document()
+    for section, content in full_test_plan.items():
+        # Add main section heading from the dictionary key
+        doc.add_heading(section, level=1)
+
+        # Split content by lines for fine-grained processing
+        lines = content.split('\n')
+        for line in lines:
+            # Skip empty lines
+            if not line.strip():
+                continue
+            # Handling Markdown-style headings within the section content
+            if line.startswith('## '):
+                doc.add_heading(line.replace('## ', ''), level=2)
+            elif line.startswith('### '):
+                doc.add_heading(line.replace('### ', ''), level=3)
+            elif line.startswith('#### '):
+                doc.add_heading(line.replace('#### ', ''), level=4)
+            else:
+                # Process the paragraph and handle bold formatting
+                p = doc.add_paragraph()
+                for part in re.split(r'(\*\*[^*]+\*\*)', line):  # Split and keep the bold parts
+                    if part.startswith('**') and part.endswith('**'):
+                        part = part[2:-2]  # Remove the asterisks
+                        p.add_run(part).bold = True
+                    else:
+                        p.add_run(part)
+
+    # Save the document
+    filename = os.path.join(application_directory, f"{application_name.replace(' ', '_')}_Test_Plan_{model_used}.docx")
+    doc.save(filename)
+    print(f"Document saved to {filename}")
+    return doc
+
+
+def download_link(doc, filename, text):
+    # Generate download link for the document
+    buffer = BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)  # Reset buffer position to the start of the stream
+    b64 = base64.b64encode(buffer.getvalue()).decode()
+    href = f'<a href="data:application/octet-stream;base64,{b64}" download="{filename}">{text}</a>'
+    return href
