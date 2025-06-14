@@ -8,6 +8,7 @@ from nlp_pre_processing.keyword_extraction import extract_keywords
 from open_ai.openai_integration_updated import generate_section, list_engines, generate_test_plan_identifier, \
     extract_main_features_and_criticality, ai_based_testing_estimation, generate_excluded_features_section, \
     generate_features_to_be_tested_section, generate_staffing_and_training_needs
+import asyncio
 from open_ai.openai_integration_updated import generate_test_deliverables_section,generate_environmental_needs_section,generate_schedule_section,generate_responsibilities_section
 from open_ai.openai_integration_updated import generate_introduction_section,generate_glossary_section,generate_remaining_test_tasks
 
@@ -233,7 +234,7 @@ if 'init' not in st.session_state:
 def extract_user_stories():
     with st.spinner('Extracting Functional & Non Functional Requirement Texts....'):
         if document_directory:
-            extracted_texts, file_names = extract_texts_from_folder(document_directory)
+            extracted_texts, file_names = asyncio.run(document_directory)
             if extracted_texts:
                 st.session_state.user_stories_text = "\n\n".join(extracted_texts)
                 st.session_state.file_names = file_names
